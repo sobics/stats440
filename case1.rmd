@@ -1,0 +1,44 @@
+---
+  title: "casestudy1_2"
+author: "Sonia Xu"
+date: "September 9, 2017"
+output: html_document
+---
+  
+  #read in the data
+  ```{r}
+dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
+dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
+```
+
+To continue our exploration of modelling the data, we decided to split the cleaned dataset into test and training data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model by adding random effects.
+#Split the data into training and test
+```{r}
+set.seed(3)
+samp <- sample(dim(dat)[1], dim(dat)[1]/10)
+test <- dat[samp,]
+train <- dat[-samp,]
+```
+
+#proposed model from case study 1
+```{r}
+library(lme4)
+fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
+summary(fm1)
+
+p_fm1 <- predict(fm1, test)
+
+ggplot(data = test, aes(p_fm1, wblot)) + geom_point() + geom_smooth()
+
+```
+Overall, the predictive power of our intuitive model seems to work pretty well. 
+
+However, for each dose, the response trend varies per lab.
+```{r}
+ggplot(data = dat, aes(x = dose1, y = wblot, color = lab, group = lab)) + geom_line()
+```
+
+#this model does not answer the question at hand well--
+```{r}
+fm2 <- lmer(wblot ~ (1+proto+dose1|lab))
+```
