@@ -34,26 +34,34 @@ p_fm1 <- predict(fm1, test)
 ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 
 ```
+
+```{r}
+fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
+summary(fm2)
+p_fm2 <- predict(fm2, dat)
+ggplot(data = dat, aes(p_fm2, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) 
+
+```
 Overall, the predictive power of our intuitive model seems to work pretty well. 
 
 However, for each dose, the response trend varies per lab.
 ```{r}
-mean_dat <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat, aes(x = dose1, y = wblot, color = lab)) + geom_line()
+mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
+ggplot(data = mean_dat1, aes(x = dose1, y = wblot, color = lab)) + geom_line()
+mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(wblot = mean(wblot))
+ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + geom_line()
 
-mean_dat <- dat %>% group_by(lab, dose2) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat, aes(x = dose2, y = wblot, color = lab)) + geom_line()
 ```
 
 #minimum model proposed in class monday
 Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
 ```{r}
 #dose response curve
-minmod <- lmer(wblot ~ (proto + dose1 + dose2|lab), dat) #minimum model
+minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), dat) #minimum model
 summary(minmod)
 plot(minmod)
-p_minmod <- predict(minmod, test)
-ggplot(data = test, aes(p_minmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+p_minmod <- predict(minmod, dat)
+ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) #+ geom_line(aes(colour=lab), linetype=5)
 
 ```
 
@@ -64,7 +72,11 @@ summary(minmod)
 plot(medmod)
 p_medmod <- predict(medmod, test)
 ggplot(data = test, aes(p_medmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+par(mfrow = c(2,2))
+hist(test$wblot, breaks = 20)
+hist(p_fm2, breaks = 20)
+hist(p_minmod, breaks = 20)
+
 
 ```
 
-```
