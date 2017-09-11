@@ -5,8 +5,12 @@ date: "September 9, 2017"
 output: html_document
 ---
   
-  #read in the data
-  ```{r}
+#read in the data
+```{r}
+library(dplyr)
+library(lme4)
+library(ggplot2)
+
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
 ```
@@ -20,15 +24,26 @@ test <- dat[samp,]
 train <- dat[-samp,]
 ```
 
+#minimum model proposed in class monday
+Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
+```{r}
+#dose response curve
+minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), train) #minimum model
+summary(minmod)
+plot(minmod)
+p_minmod <- predict(minmod, test)
+ggplot(data = test, aes(p_minmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+
+```
+
 #proposed model from case study 1
 ```{r}
-library(lme4)
 fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
 summary(fm1)
 
 p_fm1 <- predict(fm1, test)
 
-ggplot(data = test, aes(p_fm1, wblot)) + geom_point() + geom_smooth()
+ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 
 ```
 Overall, the predictive power of our intuitive model seems to work pretty well. 
