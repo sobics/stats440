@@ -128,15 +128,12 @@ min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + them
 med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
-After exploring and comparing multiple models, our final model is $y_{\frac{wblot}{body}} = \mu_i + \beta_{proto}proto_{ij} * \beta_{lab}lab_{ij}+ \beta_{dose1}*dose1_{ij} + \beta_{dose2}*dose2_{ij} + \beta_{body}*body_{ij} + \epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
+After exploring and comparing multiple models, our final model is $$y_{ij} = \mu_i + \beta_{i,proto}\cdot proto_{ij}+\beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose2_{ij}^2 + \gamma_{dose1}\cdot dose1_{ij}^2 + \gamma_{dose2}\cdot dose2_{ij}^2 + \gamma_{body}\cdot body_{ij}^2 + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
 
-We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The random effect captures the variation in the effects of dose1 and dose2 between labs, and the fixed effect captures the population effects of dose1 and dose2 across all labs. Across all labs, we also assumed that there was correlation between protocol and lab, so we added an interaction term between protocol and lab to account for the differences. We also de
+We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that there were variations between protocol and lab, so we added an interaction term between protocol and lab as a fixed effect and as a random effect. The fixed effect captures the population differences between each protocol and lab, and the random effect captures the lab-specific variation between protocol and lab. We decided to transform body weight, dose1, and dose2 to a polynomial with a degree of 2 because the scatterplot indicated a nonlinear trend between body weight and the response, the weighted blot. 
 
 Conclusion
-From this final model, we can conclude:
-1. The body weight -32.2819
-2. body weight ^2 7.9625
-poly(dose1, 2)1       31.2654     1.7552  17.813
-poly(dose1, 2)2      -25.0184     2.7766  -9.010
-poly(dose2, 2)1      -23.1467     1.7825 -12.986
-poly(dose2, 2)2        9.8150     1.9123   5.133
+From this final model, we can conclude the three major influences are:
+1. Body weight, decreasing concave up effect
+2. Dose 1, increasing concave down effect
+3. Dose 2, decreasing concave up effect
