@@ -40,6 +40,9 @@ However, for each dose, the response trend varies per lab.
 ```{r}
 mean_dat <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
 ggplot(data = mean_dat, aes(x = dose1, y = wblot, color = lab)) + geom_line()
+
+mean_dat <- dat %>% group_by(lab, dose2) %>% summarise(wblot = mean(wblot))
+ggplot(data = mean_dat, aes(x = dose2, y = wblot, color = lab)) + geom_line()
 ```
 
 #minimum model proposed in class monday
