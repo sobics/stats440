@@ -130,8 +130,10 @@ multiplot(test_p, min_p, med_p, cols = 2)
 ```
 After exploring and comparing multiple models, our final model is $y_{wblot} = \mu_i + \beta_{proto,i}proto_{ij} * \beta_{lab}lab_{ij}+ \beta_{dose1}*dose1_{ij} + \beta_{dose2}*dose2_{ij} + \beta_{body}*body_{ij} + \epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
 
-We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The random effect captures the variation in the effects of dose1 and dose2 between labs, and the fixed effect captures the population effects of dose1 and dose2 across all labs. Across all labs, we also assumed that there was correlation between protocol and lab, so we added an interaction term between protocol and lab to account for the differences. We also de
+We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that there were variations between protocol and lab, so we added an interaction term between protocol and lab as a fixed effect and as a random effect. The fixed effect captures the population differences between each protocol and lab, and the random effect captures the lab-specific variation between protocol and lab. We decided to transform body weight, dose1, and dose2 to a polynomial with a degree of 2 because the scatterplot indicated a nonlinear trend between body weight and the response, the weighted blot. 
 
 Conclusion
 From this final model, we can conclude:
 1. The body weight
+2. Concave up 
+3. Concave down
