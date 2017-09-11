@@ -63,7 +63,7 @@ medmod <- lmer(wblot ~ (proto + poly(dose1,2) + poly(dose2,2) |lab), dat) #med m
 summary(minmod)
 plot(medmod)
 p_medmod <- predict(medmod, test)
-ggplot(data = test, aes(p_minmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+ggplot(data = test, aes(p_medmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 
 ```
 
