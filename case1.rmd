@@ -109,23 +109,27 @@ Due to the high variance in the effect of dose between labs, the minimum model w
 minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), dat) #minimum model
 summary(minmod)
 plot(minmod)
-p_minmod <- predict(minmod, dat)
+p_minmod <- predict(minmod, test)
 ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) #+ geom_line(aes(colour=lab), linetype=5)
 
 ```
 
 #adding characters from proposed model to monday model
 ```{r}
-medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab)+dose1+dose2+body, dat) #med model
+medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab), dat) #med model
 summary(minmod)
 plot(medmod)
 p_medmod <- predict(medmod, test)
 ggplot(data = test, aes(p_medmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 
 par(mfrow = c(2,2))
-test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram()
-min_p <- ggplot(test,aes(p_minmod)) + geom_histogram()
-med_p <- ggplot(test,aes(p_medmod)) + geom_histogram()
+test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
+min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
+med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
 
+#another potential model
+```{r}
+
+```
