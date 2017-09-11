@@ -67,7 +67,7 @@ ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour
 
 #adding characters from proposed model to monday model
 ```{r}
-medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab), dat) #med model
+medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab)+dose1+dose2+body, dat) #med model
 summary(minmod)
 plot(medmod)
 p_medmod <- predict(medmod, test)
