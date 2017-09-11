@@ -1,6 +1,6 @@
 ---
-  title: "casestudy1_2"
-author: "Sonia Xu"
+  title: "Case Study Pt. 2"
+author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 9, 2017"
 output: html_document
 ---
