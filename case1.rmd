@@ -11,7 +11,7 @@ library(dplyr)
 library(lme4)
 library(ggplot2)
 
-###plot multiple ggplots in one place
+###plot multiple ggplots in one place  obtained from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
 #
 # ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
@@ -128,6 +128,7 @@ min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + them
 med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
+After exploring and comparing multiple models, we noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The random effect captures the variation in the effects of dose1 and dose2 between labs, and the fixed effect captures the population effects of dose1 and dose2 across all labs. Across all labs, we also assumed there were interactions between the population protocol and lab, so we  
 
 #another potential model
 ```{r}
