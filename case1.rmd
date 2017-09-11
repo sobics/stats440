@@ -116,7 +116,7 @@ ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour
 
 #adding characters from proposed model to monday model
 ```{r}
-medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #med model
+medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab), dat) #med model
 summary(minmod)
 plot(medmod)
 p_medmod <- predict(medmod, test)
@@ -128,7 +128,7 @@ min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + them
 med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
-After exploring and comparing multiple models, our final model is $y_{\frac{wblot}{body}} = \mu_i + \beta_{proto}proto_{ij} * \beta_{lab}lab_{ij}+ \beta_{dose1}*dose1_{ij} + \beta_{dose2}*dose2_{ij} + \beta_{body}*body_{ij} + \epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
+After exploring and comparing multiple models, our final model is $y_{wblot} = \mu_i + \beta_{proto}proto_{ij} * \beta_{lab}lab_{ij}+ \beta_{dose1}*dose1_{ij} + \beta_{dose2}*dose2_{ij} + \beta_{body}*body_{ij} + \epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
 
 We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The random effect captures the variation in the effects of dose1 and dose2 between labs, and the fixed effect captures the population effects of dose1 and dose2 across all labs. Across all labs, we also assumed that there was correlation between protocol and lab, so we added an interaction term between protocol and lab to account for the differences. We also de
 
