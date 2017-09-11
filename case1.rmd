@@ -24,18 +24,6 @@ test <- dat[samp,]
 train <- dat[-samp,]
 ```
 
-#minimum model proposed in class monday
-Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
-```{r}
-#dose response curve
-minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), train) #minimum model
-summary(minmod)
-plot(minmod)
-p_minmod <- predict(minmod, test)
-ggplot(data = test, aes(p_minmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
-
-```
-
 #proposed model from case study 1
 ```{r}
 fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
@@ -50,10 +38,18 @@ Overall, the predictive power of our intuitive model seems to work pretty well.
 
 However, for each dose, the response trend varies per lab.
 ```{r}
-ggplot(data = dat, aes(x = dose1, y = wblot, color = lab, group = lab)) + geom_line()
+mean_dat <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
+ggplot(data = mean_dat, aes(x = dose1, y = wblot, color = lab)) + geom_line()
 ```
 
-#this model does not answer the question at hand well--
+#minimum model proposed in class monday
+Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
 ```{r}
-fm2 <- lmer(wblot ~ (1+proto+dose1|lab))
+#dose response curve
+minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), train) #minimum model
+summary(minmod)
+plot(minmod)
+p_minmod <- predict(minmod, test)
+ggplot(data = test, aes(p_minmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+
 ```
