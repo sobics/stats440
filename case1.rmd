@@ -121,32 +121,33 @@ Based on our intuitive assumptions from Case Study 1, above is our proposed mode
 
 #Minimum Model
 However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum model that contained random effects for protocol, dose1, and dose 2 for each lab because there is high variance in the effect of dose1 and dose2 for each lab.
-```{r}
-fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
-summary(fm2)
-p_fm2 <- predict(fm2, dat)
-ggplot(data = dat, aes(p_fm2, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) 
-
-```
 
 The plots below demonstrate these differences:
 ```{r echo = F}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat1, aes(x = dose1, y = wblot, color = lab)) + geom_line() + ggtitle("Dose 1")
+d1_graph <- ggplot(data = mean_dat1, aes(x = dose1, y = wblot, color = lab)) + geom_line() + ggtitle("Dose 1")
 mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + geom_line() + ggtitle('Dose 2')
+d2_graph <- ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + geom_line() + ggtitle("Dose 2")
 
+multiplot(d1_graph, d2_graph, cols = 2)
 ```
 
-Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
 ```{r}
 #dose response curve
 minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), dat) #minimum model
 summary(minmod)
-plot(minmod)
-p_minmod <- predict(minmod, test)
-ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) #+ geom_line(aes(colour=lab), linetype=5)
+```
 
+```{r include=FALSE}
+R3 <- NULL
+for(i in 1: 100) {
+  samp <- sample(dim(dat)[1], dim(dat)[1]/10)
+  test <- dat[samp,]
+  train <- dat[-samp,]
+  lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
+  p_lm1 <- predict(minmod, test)
+  R3 <- rbind(R3, rmse(p_lm1, test$wblot))
+}
 ```
 
 #adding characters from proposed model to monday model
@@ -175,5 +176,5 @@ From this final model, we can conclude the three major influences are:
 
 Contributions
 Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
-InHee Ho - explored various models
+InHee Ho - explored various models, edited case study 2
 Ian Hua - explored various models
