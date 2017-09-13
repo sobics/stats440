@@ -85,7 +85,7 @@ par(mfrow=c(2,2))
 plot(lm1)
 ```
 
-```{r include = F, warnings = F, cache = T}
+```{r include = F, warning = F, cache = T}
 library(Metrics)
 R1 <- NULL
 for(i in 1: 100) {
@@ -105,7 +105,7 @@ fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
 summary(fm1)
 ```
 
-```{r echo = F, warnings = F, cache = T}
+```{r echo = F, warning = F, cache = T}
 R2 <- NULL
 for(i in 1: 100){
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
@@ -138,7 +138,7 @@ minmod <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2)| lab), dat) #m
 summary(minmod)
 ```
 
-```{r include=FALSE, warnings = F, cache = T}
+```{r include=FALSE, warning = F, cache = T}
 R3 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
@@ -154,7 +154,7 @@ The Minimum Model performs better than our Proposed Model, with an average RMSE 
 With the Minimum Model as our baseline, we continued to explore different models. After much exploration, this was our Final Model:
 
 #Final Model
-```{r warnings= F}
+```{r warning= F}
 finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #final model
 summary(finmod)
 
@@ -214,4 +214,4 @@ multiplot(test_p, lm_p, min_p, fin_p, cols = 2)
 #Contributions
 Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
 InHee Ho - explored various models, edited & added to case study 2
-Ian Hua - explored various models
+Ian Hua - explored various models, edited case study 2
