@@ -154,33 +154,35 @@ The Minimum Model performs better than our Proposed Model, with an average RMSE 
 With the Minimum Model as our baseline, we continued to explore different models. After much exploration, this was our Final Model:
 
 #Final Model
-```{r}
+```{r warnings= F}
 finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #final model
 summary(finmod)
+
 ```
 
-```{r include = F, cache = T, warnigs = F} 
+```{r include = F, cache = T, warning = F} 
 R4 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
   test <- dat[samp,]
   train <- dat[-samp,]
   finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), train)
-  p_finmod <- predict(finmod, dat)
+  p_finmod <- predict(finmod, test)
   R4 <- rbind(R4, RMSE(p_finmod, test$wblot))
 }
-ggplot(data = dat, aes(p_finmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
 
+```
+Overall, our Final Model's average RMSE (`r mean(R4)`) is again lower than the Minimum Model's average RMSE after 100 iterations. Comparing our Final Model's AIC against the Minimum Models' AIC, again, our Final Model has a lower AIC (`r summary(finmod)$AIC`) than our Minimum Model (`r summary(minmod)$AIC`). Furthermore, when conducting an ANOVA test between our Final Model and the Minimum Model, the Final Model is significantly better.
+
+```{r warning = F}
+anova(finmod, minmod)
+```
+Below is a plot of how well our final model predicts the true data. Overall, the trend is linear, which indicates a relatively accurate prediction.
+```{r echo = F}
+ggplot(data = test, aes(p_finmod, wblot)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
 
 ```
 
-```{r}
-par(mfrow = c(2,2))
-test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-med_p <- ggplot(test,aes(p_finmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-multiplot(test_p, min_p, med_p, cols = 2)
-```
 After exploring and comparing multiple models, our final model looks like this:
 
 $$y_{ij} = \mu_i + \beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose2_{ij}^2 + \gamma_{dose1}\cdot dose1_{ij}^2 + \gamma_{dose2}\cdot dose2_{ij}^2 + \gamma_{body}\cdot body_{ij}^2 + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
@@ -197,14 +199,30 @@ From this final model, we can conclude the following:
 
 3. Dose 2: Dose 2 squared is inversely proportional to the weighted blot - dose 2 functions as an antagonist.
 
+
 #Appendix
+
+This ANOVA test demonstrates why we chose to use proto*lab as a fixed effect instead of a random effect.
 ```{r, warning=F}
+
 fm1 <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose1,2) + poly(dose2,2) + poly(body,2) + (proto*lab), dat) # interaction
+
 fm2 <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose1,2) + poly(dose2,2) + poly(body,2), dat) # random effect
+
 anova(fm1, fm2)
 ```
 
-Contributions
+These plots illustrate the distributions of the predicted response, wblot. The more similar the distribution to the original wblot, the more accurate the prediction and the better the model. 
+```{r}
+test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("True WBlot Distribution")
+lm_p <- ggplot(test,aes(p_lm1)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Simple Linear Model")
+min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Minimum Model")
+fin_p <- ggplot(test,aes(p_finmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Final Model")
+multiplot(test_p, lm_p, min_p, fin_p, cols = 2)
+```
+
+
+#Contributions
 Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
-InHee Ho - explored various models, edited case study 2
+InHee Ho - explored various models, edited & added to case study 2
 Ian Hua - explored various models
