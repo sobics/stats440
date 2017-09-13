@@ -2,7 +2,9 @@
 title: "Case Study Pt. 2"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 9, 2017"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 #Case Study 1: Write Up 2
@@ -86,7 +88,6 @@ plot(lm1)
 ```
 
 ```{r include = F, warning = F, cache = T}
-library(Metrics)
 R1 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
@@ -94,7 +95,7 @@ for(i in 1: 100) {
   train <- dat[-samp,]
   lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
   p_lm1 <- predict(lm1, test)
-  R1 <- rbind(R1, rmse(p_lm1, test$wblot))
+  R1 <- rbind(R1, RMSE(p_lm1, test$wblot))
 }
 ```
 Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. Again, using the test data, the predicted response's Root Mean Squared Error (RMSE) is `r mean(R1)`.
