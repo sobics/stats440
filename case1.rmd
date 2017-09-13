@@ -75,7 +75,7 @@ train <- dat[-samp,]
 We believe that the best model predicts the most similar distribution of the test dataset compared to the true test dataset.
 Thus, the best models should be the most similar to this quantile:
 ```{r}
-quantile(test)
+quantile(test$wblot)
 ```
 
 #Simple Linear Model
