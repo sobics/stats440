@@ -58,13 +58,14 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
+RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
 ####
 
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
 ```
 
-To continue our exploration of modelling the data, we decided to split the cleaned dataset from our first write-up into test and training data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model by creating a more complex model with fixed and random effects.
+To continue our exploration of modelling the data, we decided to split the cleaned dataset from our first write-up into test and training data. We will fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the ful dataset. Another goodness-of-fit measurement we will use is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response the dataset. The lower the RMSE, the better the model fits the data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model when we explore more complex models with fixed and random effects.
 
 ```{r}
 set.seed(3)
@@ -85,9 +86,9 @@ par(mfrow=c(2,2))
 multiplot(lm1)
 p_lm1 <- predict(lm1, test)
 ```
-Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. 
+Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. Again, using the test data, the predicted response's Root Mean Squared Error (RMSE) is `r RMSE(p_lm1, test$wblot)`.
 #Proposed Model from Write-up 1
-```{r}
+```{r echo = F}
 fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
 summary(fm1)
 
@@ -95,7 +96,7 @@ p_fm1 <- predict(fm1, test)
 
 ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 ```
-Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
+Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. The plot demonstrates how well our proposed model's prediction of the test data fits the true test data--a linear trend indicates perfect prediction. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset compared to the Simple Linear model, since the RMSE (`r RMSE(fm1, test$wblot)`) is lower by `r  RMSE(lm1, test$wblot)- RMSE(fm1, test$wblot)` in comparison to the baseline model. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
 
 ```{r}
 fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
