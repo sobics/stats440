@@ -155,16 +155,30 @@ With the Minimum Model as our baseline, we continued to explore different models
 
 #Final Model
 ```{r}
-medmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #med model
-summary(medmod)
-plot(medmod)
-p_medmod <- predict(medmod, dat)
-ggplot(data = dat, aes(p_medmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
+finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #final model
+summary(finmod)
+```
 
+```{r include = F, cache = T, warnigs = F} 
+R4 <- NULL
+for(i in 1: 100) {
+  samp <- sample(dim(dat)[1], dim(dat)[1]/10)
+  test <- dat[samp,]
+  train <- dat[-samp,]
+  finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), train)
+  p_finmod <- predict(finmod, dat)
+  R4 <- rbind(R4, RMSE(p_finmod, test$wblot))
+}
+ggplot(data = dat, aes(p_finmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
+
+
+```
+
+```{r}
 par(mfrow = c(2,2))
 test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
+med_p <- ggplot(test,aes(p_finmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
 After exploring and comparing multiple models, our final model looks like this:
