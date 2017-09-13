@@ -5,9 +5,6 @@ date: "September 9, 2017"
 output: html_document
 ---
 
-##ITERATE TEST/SAMPLE 100 times at least....
-
-
 #Case Study 1: Write Up 2
 ```{r include = F}
 library(dplyr)
@@ -173,3 +170,8 @@ From this final model, we can conclude the three major influences are:
 1. Body weight, decreasing concave up effect
 2. Dose 1, increasing concave down effect
 3. Dose 2, decreasing concave up effect
+
+Contributions
+Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
+InHee Ho - explored various models
+Ian Hua - explored various models
