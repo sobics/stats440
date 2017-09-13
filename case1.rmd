@@ -58,16 +58,15 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
 ####
 
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
 ```
 
-To continue our exploration of modelling the data, we decided to split the cleaned dataset from our first write-up into test and training data. We will fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. Another goodness-of-fit measurement we will use is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response the dataset. The lower the RMSE, the better the model fits the data. We sample/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from utilizing more complex models with fixed and random effects in comparison to the simple linear model.
+To continue our exploration of modelling the data, we decided to split the cleaned dataset from our first write-up into test and training data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model by creating a more complex model with fixed and random effects.
 
-```{r include = F}
+```{r}
 set.seed(3)
 samp <- sample(dim(dat)[1], dim(dat)[1]/10)
 test <- dat[samp,]
@@ -97,7 +96,7 @@ for(i in 1: 100) {
   R1 <- rbind(R1, RMSE(p_lm1, test$wblot))
 }
 ```
-Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. Again, using the test data, the predicted response's Root Mean Squared Error (RMSE) is `r mean(R1)`.
+Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. 
 #Proposed Model from Write-up 1
 ```{r}
 fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
@@ -149,7 +148,7 @@ ggplot(data = dat, aes(p_minmod, wblot)) + geom_smooth() + geom_point(aes(colour
 
 #adding characters from proposed model to monday model
 ```{r}
-medmod <- lmer(wblot ~ (1+ proto + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #med model
+medmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #med model
 summary(medmod)
 plot(medmod)
 p_medmod <- predict(medmod, dat)
@@ -161,7 +160,7 @@ min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + them
 med_p <- ggplot(test,aes(p_medmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
 multiplot(test_p, min_p, med_p, cols = 2)
 ```
-After exploring and comparing multiple models, our final model is $$y_{ij} = \mu_i + \beta_{i,proto}\cdot proto_{ij}+\beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose2_{ij}^2 + \gamma_{dose1}\cdot dose1_{ij}^2 + \gamma_{dose2}\cdot dose2_{ij}^2 + \gamma_{body}\cdot body_{ij}^2 + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
+After exploring and comparing multiple models, our final model is $$y_{ij} = \mu_i + \beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose2_{ij}^2 + \gamma_{dose1}\cdot dose1_{ij}^2 + \gamma_{dose2}\cdot dose2_{ij}^2 + \gamma_{body}\cdot body_{ij}^2 + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
 
 We noticed that adding dose1 and dose2 as both fixed and random effects better fit the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that there were variations between protocol and lab, so we added an interaction term between protocol and lab as a fixed effect and as a random effect. The fixed effect captures the population differences between each protocol and lab, and the random effect captures the lab-specific variation between protocol and lab. We decided to transform body weight, dose1, and dose2 to a polynomial with a degree of 2 because the scatterplot indicated a nonlinear trend between body weight and the response, the weighted blot. 
 
