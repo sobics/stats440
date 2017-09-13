@@ -83,7 +83,13 @@ quantile(test)
 ```
 
 #Simple Linear Model
-```{r echo = F, warnings = F}
+```{r}
+lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
+par(mfrow=c(2,2))
+plot(lm1)
+```
+
+```{r include = F, warnings = F, cache = T}
 R1 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
@@ -93,8 +99,6 @@ for(i in 1: 100) {
   p_lm1 <- predict(lm1, test)
   R1 <- rbind(R1, RMSE(p_lm1, test$wblot))
 }
-par(mfrow=c(2,2))
-plot(lm1)
 ```
 Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. Again, using the test data, the predicted response's Root Mean Squared Error (RMSE) is `r mean(R1)`.
 #Proposed Model from Write-up 1
@@ -103,7 +107,7 @@ fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), trai
 summary(fm1)
 ```
 
-```{r echo = F}
+```{r echo = F, warnings = F, cache = T}
 R2 <- NULL
 for(i in 1: 100){
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
