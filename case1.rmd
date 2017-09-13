@@ -189,17 +189,6 @@ $$y_{ij} = \mu_i + \beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose
 
 We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that different types of protocol have a different effect for each labs. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix). We decided to transform body weight, dose1, and dose2 to a polynomial with a degree of 2 because the scatterplot indicated a nonlinear trend between body weight and the response, the weighted blot. 
 
-#Conclusion
-
-From this final model, we can conclude the following:
-
-1. Body weight: Body weight squared is proportional to the weighted blot
-
-2. Dose 1: Dose 1 squared is proportional to the weighted blot - dose 1 functions as an agonist.
-
-3. Dose 2: Dose 2 squared is inversely proportional to the weighted blot - dose 2 functions as an antagonist.
-
-
 #Appendix
 
 This ANOVA test demonstrates why we chose to use proto*lab as a fixed effect instead of a random effect.
