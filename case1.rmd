@@ -5,12 +5,12 @@ date: "September 9, 2017"
 output: html_document
 ---
   
-#read in the data
+#Case Study 1: Write Up 2
 ```{r include = F}
 library(dplyr)
 library(lme4)
 library(ggplot2)
-
+#read in the data
 ###plot multiple ggplots in one place  obtained from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
 #
@@ -64,16 +64,29 @@ dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".
 dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
 ```
 
-To continue our exploration of modelling the data, we decided to split the cleaned dataset into test and training data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model by adding random effects.
-#Split the data into training and test
+To continue our exploration of modelling the data, we decided to split the cleaned dataset from our first write-up into test and training data. By understanding how well the models predict the blotted uterus weight, we can see if there is improvement from the simple linear model by creating a more complex model with fixed and random effects.
+
 ```{r}
 set.seed(3)
 samp <- sample(dim(dat)[1], dim(dat)[1]/10)
 test <- dat[samp,]
 train <- dat[-samp,]
 ```
+We believe that the best model predicts the most similar distribution of the test dataset compared to the true test dataset.
+Thus, the best models should be the most similar to this quantile:
+```{r}
+quantile(test)
+```
 
-#proposed model from case study 1
+#Simple Linear Model
+```{r echo = F}
+lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
+par(mfrow=c(2,2))
+multiplot(lm1)
+p_lm1 <- predict(lm1, test)
+```
+Checking the basic assumptions of normality for the simple linear model, we can clearly see problems in the model. Comparing its prediction accuracy to the true dataset, we obtain `r quantile(p_lm1)`, which has a similar distribution mean. However, the tails of the predicted test dataset are wider than the true test dataset, which suggests that this model can be improved. 
+#Proposed Model from Write-up 1
 ```{r}
 fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
 summary(fm1)
@@ -81,8 +94,8 @@ summary(fm1)
 p_fm1 <- predict(fm1, test)
 
 ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
-
 ```
+Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
 
 ```{r}
 fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
