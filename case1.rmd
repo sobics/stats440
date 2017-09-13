@@ -183,13 +183,6 @@ ggplot(data = test, aes(p_finmod, wblot)) + geom_smooth() #+ geom_line(aes(colou
 
 ```
 
-```{r}
-par(mfrow = c(2,2))
-test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-med_p <- ggplot(test,aes(p_finmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw()
-multiplot(test_p, min_p, med_p, cols = 2)
-```
 After exploring and comparing multiple models, our final model looks like this:
 
 $$y_{ij} = \mu_i + \beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose2_{ij}^2 + \gamma_{dose1}\cdot dose1_{ij}^2 + \gamma_{dose2}\cdot dose2_{ij}^2 + \gamma_{body}\cdot body_{ij}^2 + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$$.
@@ -204,6 +197,7 @@ From this final model, we can conclude the three major influences are:
 
 #Appendix
 
+This ANOVA test demonstrates why we chose to use proto*lab as a fixed effect instead of a random effect.
 ```{r, warning=F}
 
 fm1 <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose1,2) + poly(dose2,2) + poly(body,2) + (proto*lab), dat) # interaction
@@ -213,8 +207,17 @@ fm2 <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose
 anova(fm1, fm2)
 ```
 
+These plots illustrate the distributions of the predicted response, wblot. The more similar the distribution to the original wblot, the more accurate the prediction and the better the model. 
+```{r}
+test_p <- ggplot(data = test, aes(x = wblot)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("True WBlot Distribution")
+lm_p <- ggplot(test,aes(p_lm1)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Simple Linear Model")
+min_p <- ggplot(test,aes(p_minmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Minimum Model")
+fin_p <- ggplot(test,aes(p_finmod)) + geom_histogram() + lims(x = c(0,4)) + theme_bw() + ggtitle("Final Model")
+multiplot(test_p, lm_p, min_p, fin_p, cols = 2)
+```
+
 
 #Contributions
 Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
-InHee Ho - explored various models, edited case study 2
+InHee Ho - explored various models, edited & added to case study 2
 Ian Hua - explored various models
