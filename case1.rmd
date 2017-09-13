@@ -154,23 +154,32 @@ The Minimum Model performs better than our Proposed Model, with an average RMSE 
 With the Minimum Model as our baseline, we continued to explore different models. After much exploration, this was our Final Model:
 
 #Final Model
-```{r}
+```{r warnings= F}
 finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #final model
 summary(finmod)
+
 ```
 
-```{r include = F, cache = T, warnigs = F} 
+```{r include = F, cache = T, warning = F} 
 R4 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
   test <- dat[samp,]
   train <- dat[-samp,]
   finmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), train)
-  p_finmod <- predict(finmod, dat)
+  p_finmod <- predict(finmod, test)
   R4 <- rbind(R4, RMSE(p_finmod, test$wblot))
 }
-ggplot(data = dat, aes(p_finmod, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
 
+```
+Overall, our Final Model's average RMSE (`r mean(R4)`) is again lower than the Minimum Model's average RMSE after 100 iterations. Comparing our Final Model's AIC against the Minimum Models' AIC, again, our Final Model has a lower AIC (`r summary(finmod)$AIC`) than our Minimum Model (`r summary(minmod)$AIC`). Furthermore, when conducting an ANOVA test between our Final Model and the Minimum Model, the Final Model is significantly better.
+
+```{r warning = F}
+anova(finmod, minmod)
+```
+Below is a plot of how well our final model predicts the true data. Overall, the trend is linear, which indicates a relatively accurate prediction.
+```{r}
+ggplot(data = test, aes(p_finmod, wblot)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
 
 ```
 
