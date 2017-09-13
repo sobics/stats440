@@ -95,7 +95,7 @@ p_fm1 <- predict(fm1, test)
 
 ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
 ```
-Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
+Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
 
 ```{r}
 fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
@@ -104,7 +104,6 @@ p_fm2 <- predict(fm2, dat)
 ggplot(data = dat, aes(p_fm2, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) 
 
 ```
-Overall, the predictive power of our intuitive model seems to work pretty well. 
 
 However, for each dose, the response trend varies per lab.
 ```{r}
