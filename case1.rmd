@@ -116,27 +116,20 @@ for(i in 1: 100){
   R2 <- rbind(R2, RMSE(p_fm1, test$wblot))
 }
 ```
-Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. The plot demonstrates how well our proposed model's prediction of the test data fits the true test data--a linear trend indicates perfect prediction. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset compared to the Simple Linear Model, since the RMSE (`r mean(R2)`) is lower by `r R1-R2` in comparison to the baseline model. However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum equation of:
+Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. The plot demonstrates how well our proposed model's prediction of the test data fits the true test data--a linear trend indicates perfect prediction. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset compared to the Simple Linear Model, since the RMSE (`r mean(R2)`) is lower by `r R1-R2` in comparison to the baseline model. 
 
-```{r}
-fm2 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
-summary(fm2)
-```
+#Minimum Model
+However, we were informed by a more experienced Statistician (our TA) about the necessity to model the data with a minimum model that contained random effects for protocol, dose1, and dose 2 for each lab because there is high variance in the effect of dose1 and dose2 for each lab.
 
-```{r}
-ggplot(data = dat, aes(p_fm2, wblot)) + geom_smooth() + geom_point(aes(colour = lab), alpha = 0.3) 
-```
-
-However, for each dose, the response trend varies per lab.
-```{r}
+The plots below demonstrate these differences:
+```{r echo = F}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat1, aes(x = dose1, y = wblot, color = lab)) + geom_line()
+ggplot(data = mean_dat1, aes(x = dose1, y = wblot, color = lab)) + geom_line() + ggtitle("Dose 1")
 mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(wblot = mean(wblot))
-ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + geom_line()
+ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + geom_line() + ggtitle('Dose 2')
 
 ```
 
-#minimum model proposed in class monday
 Due to the high variance in the effect of dose between labs, the minimum model was altered to include dose1 and dose2 for each lab.
 ```{r}
 #dose response curve
