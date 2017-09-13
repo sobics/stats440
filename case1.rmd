@@ -178,7 +178,7 @@ Overall, our Final Model's average RMSE (`r mean(R4)`) is again lower than the M
 anova(finmod, minmod)
 ```
 Below is a plot of how well our final model predicts the true data. Overall, the trend is linear, which indicates a relatively accurate prediction.
-```{r}
+```{r echo = F}
 ggplot(data = test, aes(p_finmod, wblot)) + geom_smooth() #+ geom_line(aes(colour=lab), linetype=5)
 
 ```
@@ -196,20 +196,25 @@ $$y_{ij} = \mu_i + \beta_{i,dose1}\cdot dose1_{ij}^2 + \beta_{i,dose2}\cdot dose
 
 We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that different types of protocol have a different effect for each labs. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix). We decided to transform body weight, dose1, and dose2 to a polynomial with a degree of 2 because the scatterplot indicated a nonlinear trend between body weight and the response, the weighted blot. 
 
-Conclusion
+#Conclusion
 From this final model, we can conclude the three major influences are:
 1. Body weight, decreasing concave up effect
 2. Dose 1, increasing concave down effect
 3. Dose 2, decreasing concave up effect
 
 #Appendix
+
 ```{r, warning=F}
+
 fm1 <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose1,2) + poly(dose2,2) + poly(body,2) + (proto*lab), dat) # interaction
+
 fm2 <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2) |lab) + poly(dose1,2) + poly(dose2,2) + poly(body,2), dat) # random effect
+
 anova(fm1, fm2)
 ```
 
-Contributions
+
+#Contributions
 Sonia Xu - goodness-of-fit for every model (RMSE, test/training), wrote case study 2, explored models
 InHee Ho - explored various models, edited case study 2
 Ian Hua - explored various models
