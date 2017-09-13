@@ -80,7 +80,7 @@ quantile(test$wblot)
 
 #Simple Linear Model
 ```{r}
-lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
+lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = dat)
 par(mfrow=c(2,2))
 plot(lm1)
 ```
@@ -101,7 +101,7 @@ Checking the basic assumptions of normality for the simple linear model, we can 
 
 #Proposed Model from Write-up 1
 ```{r}
-fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), train)
+fm1 <- lmer(wblot ~ 1 + (proto|lab) + body + poly(dose1,2) + poly(dose2,2), dat)
 summary(fm1)
 ```
 
@@ -131,25 +131,25 @@ d2_graph <- ggplot(data = mean_dat2, aes(x = dose2, y = wblot, color = lab)) + g
 
 multiplot(d1_graph, d2_graph, cols = 2)
 ```
-
+In order to capture these random effects of dose1 and dose2, below is our minimum model.
 ```{r}
 #dose response curve
-minmod <- lmer(wblot ~ (1 + proto + dose1 + dose2| lab), dat) #minimum model
+minmod <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2)| lab), dat) #minimum model
 summary(minmod)
 ```
 
-```{r include=FALSE}
+```{r include=FALSE, warnings = F, cache = T}
 R3 <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
   test <- dat[samp,]
   train <- dat[-samp,]
-  lm1 <- lm(wblot ~ 1+ poly(dose1,2) + poly(dose2,2), data = train)
-  p_lm1 <- predict(minmod, test)
-  R3 <- rbind(R3, rmse(p_lm1, test$wblot))
+  minmod <- lmer(wblot ~ (1 + proto + poly(dose1,2) + poly(dose2,2)|lab), train)
+  p_minmod <- predict(minmod, test)
+  R3 <- rbind(R3, RMSE(p_minmod, test$wblot))
 }
 ```
-
+The Minimum Model performs better. 
 #adding characters from proposed model to monday model
 ```{r}
 medmod <- lmer(wblot ~ (1 + poly(dose1,2) + poly(dose2,2) |lab)+poly(dose1,2)+poly(dose2,2)+poly(body,2)+(proto*lab), dat) #med model
