@@ -116,7 +116,7 @@ for(i in 1: 100){
   p_fm1 <- predict(fm1, test)
   R2 <- rbind(R2, RMSE(p_fm1, test$wblot))
 }
-ggplot(data = test, aes(p_fm1, wblot)) + geom_point(aes(colour = lab)) + geom_smooth() + geom_line(aes(colour=lab), linetype=5)
+ggplot(data = test, aes(p_fm1, wblot)) + geom_smooth() 
 ```
 Based on our intuitive assumptions from Case Study 1, above is our proposed model from write-up 1. The plot demonstrates how well our proposed model's prediction of the test data fits the true test data--a linear trend indicates perfect prediction. Overall, the predictive power of our intuitive model seems to work pretty well. The distribution of our proposed model more closely follows that of the true dataset compared to the Simple Linear Model, since the RMSE (`r mean(R2)`) is lower by `r mean(R1)-mean(R2)` in comparison to the baseline model. 
 
