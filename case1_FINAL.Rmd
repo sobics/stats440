@@ -1,0 +1,12 @@
+---
+title: "case1_FINAL"
+author: "Sonia Xu"
+date: "September 18, 2017"
+output: html_document
+---
+
+#Introduction
+#EDA
+#Final Model
+#Discussion of Final Model
+#Recommendations
