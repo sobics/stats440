@@ -36,6 +36,9 @@ fm1 <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |
 #Discussion of Final Model
 ```{r}
 ```
+-normality
+-residuals
+-every linear check possible
 
 #Recommendations
 ```{r}
