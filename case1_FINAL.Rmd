@@ -6,7 +6,18 @@ output: html_document
 ---
 
 #Introduction
+```{r}
+```
+
 #EDA
+```{r}
+```
 #Final Model
+```{r}
+```
 #Discussion of Final Model
+```{r}
+```
 #Recommendations
+```{r}
+```
