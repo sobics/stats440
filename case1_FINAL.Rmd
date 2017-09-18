@@ -6,8 +6,7 @@ output: html_document
 ---
 
 #Introduction
-The following data are from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay is to screen chemicals for estrogenic effects  agonist (EE) or antagonist (ZM), and the purpose of this study is to determine the best model to fit the data. One clear challenge is the consistency among variables and protocols throughout all data in the study. It is necessary to identify any possible differences between labs and protocols in order to discover the consistency and effectiveness of the two chemicals. 
-
+The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. 
 ```{r}
 ```
 
