@@ -8,14 +8,17 @@ output: html_document
 #Introduction
 
 The following data are from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay is to screen chemicals for estrogenic effects  agonist (EE) or antagonist (ZM), and the purpose of this study is to determine the best model to fit the data. One clear challenge is the consistency among variables and protocols throughout all data in the study. It is necessary to identify any possible differences between labs and protocols in order to discover the consistency and effectiveness of the two chemicals. 
+
 ```{r}
 ```
+#Data
 
 #EDA
 ```{r}
 ```
 #Final Model
 ```{r}
+fm1 <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body + 1),2) + (proto*lab), dat)
 ```
 #Discussion of Final Model
 ```{r}
