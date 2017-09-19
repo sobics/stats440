@@ -65,14 +65,20 @@ Our final dataset contains 2677 observations and 6 features: lab, protocol, dose
 
 
 #Exploratory Data Analysis
-[show plot of dose1 and discuss the high leverage of the outliers] It is critical to counter the leverage in our regression model - we use log(dose1) in our model to fix this. After doing the log of dose1, we notice that it is not exactly linear and include a polynomial to better fit the model.
+[show plot of dose1 and discuss the high leverage of the outliers] It is critical to counter the leverage in our regression model - we use $log(dose1)^2$ in our model to fix this. After doing the log of dose1, we notice that it is not exactly linear and include a polynomial to better fit the model.
 ```{r}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(blot = mean(blot))
-d1_graph <- ggplot(data = mean_dat1, aes(x = dose1, y = blot, color = lab)) + geom_line() + ggtitle("Dose 1")
+ggplot(data = mean_dat1, aes(x = dose1, y = blot, color = lab)) + geom_line() + ggtitle("Dose 1")
 mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(blot = mean(blot))
-d2_graph <- ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + ggtitle("Dose 2")
+ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + ggtitle("Dose 2")
 
-multiplot(d1_graph, d2_graph, cols = 2)
+
+
+ggplot(data=dat, aes(dose1)) + geom_histogram()
+ggplot(data = dat, aes(dose2)) + geom_histogram()
+
+ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
+ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
 ```
 ```
 
