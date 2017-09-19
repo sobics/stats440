@@ -73,9 +73,7 @@ mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(blot = mean(blot))
 ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + ggtitle("Dose 2")
 
 
-
-ggplot(data=dat, aes(dose1)) + geom_histogram()
-ggplot(data = dat, aes(dose2)) + geom_histogram()
+ggplot(data = dat, aes(x=(log(dose1 +1)^2), y=blot)) + geom_point()
 
 ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
 ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
