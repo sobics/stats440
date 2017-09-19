@@ -1,6 +1,6 @@
 ---
 title: "case1_FINAL"
-author: "Sonia Xu"
+author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 18, 2017"
 output: html_document
 ---
@@ -80,12 +80,14 @@ ggplot(data = dat, aes(dose2)) + geom_histogram()
 ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
 ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
 ```
-```
+
 
 #Final Model
 ```{r}
-fm1 <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
+fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
 ```
+
+$$log{(y_{ij}+1)} = \mu_i + \beta_{i,dose1}\cdot log^2(dose1_{ij}+1) + \beta_{i,dose2}\cdot log^2(dose2_{ij}+1) + \gamma_{dose1}\cdot log^2(dose1_{ij}+1) + \gamma_{dose2}\cdot log^2(dose2_{ij}+1) + \gamma_{body}\cdot log^2(body_{ij}) + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$
 
 #Discussion of Final Model
 ```{r}
