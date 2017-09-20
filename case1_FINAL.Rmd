@@ -137,15 +137,31 @@ We decided to split the cleaned dataset from our first write-up into test and tr
 Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (`r mean(R4)`) utilizing this final model.
 
 #Discussion of Final Model
-To compare the variation between labs, we utilized Lab , Protocol A, dose 1, dose 2 as a baseline.
-```{r}
+To compare the variation between labs, we utilized Lab Basf, Protocol A as a baseline.
+```{r include = F}
 summary(fm)
 ```
 #Differences Between Doses in Labs
 
+
 #Differences Between Protocols in Labs
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(.094434)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(-0.018317)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.167783)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.042518)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*(e^(0.297668)-1)`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
 
-
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.297668)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.297668)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
+A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.297668)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
+\newline
 -normality
 -residual diagnostics
 -every linear check possible
@@ -157,3 +173,7 @@ summary(fm)
 ```
 
 #Appendix
+Summary Statistics of the Final Model are below:
+```{r}
+summary(fm)
+```
