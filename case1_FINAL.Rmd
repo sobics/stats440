@@ -98,13 +98,17 @@ Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix th
 Additionally, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. We treat this as a fixed effect and include this interaction influence in our final model.
 
 
-##Final Model
-Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable.
+##Final Model: Linear Mixed Effect Model
+The final model used to capture the variability in the effects of the two doses on uterus weight across labs and other differences in protocol between labs wa a Linear Mixed Effect Model. The random effects are dose 1 and dose 2 for each lab, and the fixed effects are dose 1, dose 2, body, and an interaction between protocol and lab. The response is the blotted uterus weight.
+
+We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that different types of protocol have a different effect for each labs. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix). 
+
+To better fit the model, transformations of the features and response were utilized. Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable, which ______.
 ```{r}
 fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
+plot(fm, main = "Fitted vs. Residuals", xlab = "fitted", ylab = "residuals")
 ```
 
-$$log{(y_{ij}+1)} = \mu_i + \beta_{i,dose1}\cdot log^2(dose1_{ij}+1) + \beta_{i,dose2}\cdot log^2(dose2_{ij}+1) + \gamma_{dose1}\cdot log^2(dose1_{ij}+1) + \gamma_{dose2}\cdot log^2(dose2_{ij}+1) + \gamma_{body}\cdot log^2(body_{ij}) + \gamma_{inter}\cdot proto_{ij}\cdot lab_{ij} +\epsilon_{ij}$$ where $\epsilon_{ij} \sim N(0,\nu^2)$ and $\mu_i \sim N(\mu, \sigma^2)$
 
 #Discussion of Final Model
 ```{r}
@@ -118,3 +122,5 @@ $$log{(y_{ij}+1)} = \mu_i + \beta_{i,dose1}\cdot log^2(dose1_{ij}+1) + \beta_{i,
 -scientific implications of the model
 ```{r}
 ```
+
+#Appendix
