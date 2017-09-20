@@ -138,10 +138,8 @@ Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which mea
 
 #Discussion of Final Model
 To compare the variation between labs, we utilized Lab Basf, Protocol A as a baseline.
-```{r include = F}
-summary(fm)
-```
-#Differences Between Doses in Labs
+
+#Differences Between Doses 
 
 
 #Differences Between Protocols in Labs
