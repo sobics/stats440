@@ -120,10 +120,9 @@ qqnorm(resid(fm))
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
 
 #Supplementary Goodness-of-Fit Checks
-To reaffirm that the
-However, although a good indicator, it is important to note that relying solely on RMSE to assess the goodness-of-fit of a model is not enough; we must rely on multiple measurements like AIC, Adjusted R-Squared, ANOVA tests, etc to compare models. 
-###Test & Training Data
-We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models.
+To reaffirm that the model fits the data well, we added two goodness-of-fit checks: test & training data and RMSE. Although good indicators, it is important to note that relying solely on test & training data or RMSE to assess the goodness-of-fit of a model is not enough; we must ultimately rely on the linearity checks to ensure model fit.
+
+We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of `r mean(p_finmod - test)`. 
 ```{r, cache = T}
 R4 <- NULL
 for(i in 1: 100) {
@@ -136,11 +135,7 @@ for(i in 1: 100) {
 }
 ```
 
-###RMSE
-Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. 
-```{r}
-
-```
+Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (`r mean(R4)`) utilizing this final model.
 
 #Discussion of Final Model
 ```{r}
