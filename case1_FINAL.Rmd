@@ -106,26 +106,40 @@ We noticed that adding dose1 and dose2 as both fixed and random effects better f
 To better fit the model, transformations of the features and response were utilized. Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable, which ______.
 
 #Assessing the Fit of the Final Model
-To understand how well the final model fit the data, we checked that the model met the linearity requirements. 
+To understand how well the final model fit the data, we checked that the model met the linearity assumptions. 
 
 ```{r}
 fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
 par(mfrow= c(1,2))
-plot(fm, main = "Fitted vs. Residuals", xlab = "fitted", ylab = "residuals")
+plot(fm, main = "Residuals vs Fitted", xlab = "fitted", ylab = "residuals")
 ```
-
+Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points and randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
 ```{r}
 qqnorm(resid(fm))
 ```
-#Supplementary Goodness-of-fit Checks
+Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
+
+#Supplementary Goodness-of-Fit Checks
+To reaffirm that the
+However, although a good indicator, it is important to note that relying solely on RMSE to assess the goodness-of-fit of a model is not enough; we must rely on multiple measurements like AIC, Adjusted R-Squared, ANOVA tests, etc to compare models. 
 ###Test & Training Data
 We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models.
-```{r}
+```{r, cache = T}
+R4 <- NULL
+for(i in 1: 100) {
+  samp <- sample(dim(dat)[1], dim(dat)[1]/10)
+  test <- dat[samp,]
+  train <- dat[-samp,]
+  finmod <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
+  p_finmod <- predict(finmod, test)
+  R4 <- rbind(R4, RMSE(exp(p_finmod)-1, test$blot))
+}
 ```
+
 ###RMSE
-Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. However, although a good indicator, it is important to note that relying solely on RMSE to assess the goodness-of-fit of a model is not enough; we must rely on multiple measurements like AIC, Adjusted R-Squared, ANOVA tests, etc to compare models. 
+Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. 
 ```{r}
-RMSE()
+
 ```
 
 #Discussion of Final Model
