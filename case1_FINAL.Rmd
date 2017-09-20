@@ -110,7 +110,7 @@ fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |l
 par(mfrow= c(1,2))
 plot(fm, main = "Residuals vs Fitted", xlab = "fitted", ylab = "residuals")
 ```
-Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points and randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
+Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points are randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
 ```{r}
 qqnorm(resid(fm))
 ```
