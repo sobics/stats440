@@ -242,7 +242,7 @@ If the blotted uterus weight of a rat in Lab Zeneca, Protocol A increase by one 
 
 
 #Recommendations
-Differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences.
+Differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. The lab with the largest differences in blotted uterus weight compared to that of Lab Basf, Protocol A was Lab InEnvTox, Procol D.
 
 Of course, the effects of the two doses vary between labs as well.
 
