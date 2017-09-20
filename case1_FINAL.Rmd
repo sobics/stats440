@@ -60,11 +60,11 @@ The following data is from an international validation study (19 labs, 6 nations
 ```
 
 #Methodology
-Our approach to answer our problem followed these 4 steps:
-1. Data-cleaning
-2. Exploratory Data Analysis
-3. Fitting the data to a Linear Mixed-Effect Model
-4. Interpreting the data, model, and results
+Our approach to answer our problem followed these 4 steps: \newline
+1. Data-cleaning \newline
+2. Exploratory Data Analysis \newline
+3. Fitting the data to a Linear Mixed-Effect Model \newline
+4. Interpreting the data, model, and results \newline
 
 #Dataset
 The final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
