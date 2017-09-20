@@ -60,8 +60,10 @@ The following data is from an international validation study (19 labs, 6 nations
 ```
 
 #Data
-Our final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight. 
+Our final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
 ```{r}
+#maybe implies that we should log(blot)? idk
+ggplot(data = dat, aes(y = lab, x = blot, colour = lab)) + geom_point(alpha=0.05, size=10) + theme(legend.position="none")
 ```
 
 
@@ -86,6 +88,7 @@ Additionally, it is likely that the protocols at each lab differ due to a multit
 
 
 #Final Model
+Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable.
 ```{r}
 fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
 ```
@@ -96,9 +99,11 @@ $$log{(y_{ij}+1)} = \mu_i + \beta_{i,dose1}\cdot log^2(dose1_{ij}+1) + \beta_{i,
 ```{r}
 ```
 -normality
--residuals
+-residual diagnostics
 -every linear check possible
+-what can we say about the variability between labs?
 
 #Recommendations
+-scientific implications of the model
 ```{r}
 ```
