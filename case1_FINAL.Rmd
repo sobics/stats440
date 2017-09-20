@@ -162,13 +162,10 @@ A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Pro
 \newline
 A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Protocol B leads to a `r 100*e^(0.297668)-1`% increase in the blotted uterus weight of a rat in Lab Basf, Protocol A.
 \newline
--normality
--residual diagnostics
--every linear check possible
--what can we say about the variability between labs?
+
 
 #Recommendations
--scientific implications of the model
+Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences.
 ```{r}
 ```
 
