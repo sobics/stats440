@@ -82,6 +82,7 @@ ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha
 ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
 ```
 Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix this.
+Additionally, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. We treat this as a fixed effect and include this interaction influence in our final model.
 
 
 #Final Model
