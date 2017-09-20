@@ -9,6 +9,7 @@ output: html_document
 library(dplyr)
 library(lme4)
 library(ggplot2)
+library(magrittr)
 #read in the data
 ###plot multiple ggplots in one place  obtained from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 
@@ -59,25 +60,28 @@ The following data is from an international validation study (19 labs, 6 nations
 ```
 
 #Data
-Our final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, blotted uterus weight. 
+Our final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight. 
 ```{r}
 ```
 
 
 #Exploratory Data Analysis
-[show plot of dose1 and discuss the high leverage of the outliers] It is critical to counter the leverage in our regression model - we use $log(dose1)^2$ in our model to fix this. After doing the log of dose1, we notice that it is not exactly linear and include a polynomial to better fit the model.
+Grouping the data by lab, let us take a closer look at the relationships between dose1, dose2, body, and blot. We can easily see the points at dose1 = 10.0 results in high leverage.
 ```{r}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(blot = mean(blot))
 ggplot(data = mean_dat1, aes(x = dose1, y = blot, color = lab)) + geom_line() + ggtitle("Dose 1")
 mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(blot = mean(blot))
 ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + ggtitle("Dose 2")
-
-
+mean_body <- dat %>% group_by(lab, body) %>% summarise(blot = mean(blot))
+ggplot(data = mean_body, aes(x = body, y = blot, color = lab)) + geom_point(alpha = 0.5) + ggtitle("Body") + stat_smooth(alpha = 0.1)
+```
+It is critical to counter the leverage in our regression model - we apply a log on these explanatory variables to account for this leverage. After, we notice that the plots are not exactly linear and it is wiser to include a polynomial to better fit the model.
+```{r}
 ggplot(data = dat, aes(x=(log(dose1 +1)^2), y=blot)) + geom_point()
-
 ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
 ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
 ```
+Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix this.
 
 
 #Final Model
