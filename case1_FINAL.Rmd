@@ -51,7 +51,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
-dat <-  dat %>% filter(complete.cases(blot)) %>% mutate(wblot = blot/body, wwet = wet/body)
+dat <-  dat %>% filter(complete.cases(blot)) %>% select(-wet) 
 ```
 
 #Introduction
@@ -59,15 +59,26 @@ The following data is from an international validation study (19 labs, 6 nations
 ```{r}
 ```
 
-#Data
-Our final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
+#Methodology
+Our approach to answer our problem followed these 4 steps:
+1. Data-cleaning
+2. Exploratory Data Analysis
+3. Fitting the data to a Linear Mixed-Effect Model
+4. Interpreting the data, model, and results
+
+#Dataset
+The final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
+Three key pieces of data were removed: 4 observations due to missing data, the feature, group, due to multicollinearity, and the feature, wet, due to its variability in capturing the uterus weight. Below is a preview of the final dataset:
+```{r}
+head(dat)
+```
+
+##Exploratory Data Analysis
+After thorough exploratory data analysis, 
 ```{r}
 #maybe implies that we should log(blot)? idk
 ggplot(data = dat, aes(y = lab, x = blot, colour = lab)) + geom_point(alpha=0.05, size=10) + theme(legend.position="none")
 ```
-
-
-#Exploratory Data Analysis
 Grouping the data by lab, let us take a closer look at the relationships between dose1, dose2, body, and blot. We can easily see the points at dose1 = 10.0 results in high leverage.
 ```{r}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(blot = mean(blot))
@@ -87,7 +98,7 @@ Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix th
 Additionally, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. We treat this as a fixed effect and include this interaction influence in our final model.
 
 
-#Final Model
+##Final Model
 Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable.
 ```{r}
 fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
