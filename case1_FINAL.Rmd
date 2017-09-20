@@ -73,13 +73,13 @@ Three key pieces of data were removed: 4 observations due to missing data, the f
 head(dat)
 ```
 
-##Exploratory Data Analysis
-After thorough exploratory data analysis, 
+##Final Model: Linear Mixed Effect Model
+#EDA and Choosing Explanatory Variables
+After thorough exploratory data analysis, we notice the differences in variance and mean of blot between labs. This hints towards heteroskedasticity in potential models which is addressed later in this section.
 ```{r}
-#maybe implies that we should log(blot)? idk
 ggplot(data = dat, aes(y = lab, x = blot, colour = lab)) + geom_point(alpha=0.05, size=10) + theme(legend.position="none")
 ```
-Grouping the data by lab, let us take a closer look at the relationships between dose1, dose2, body, and blot. We can easily see the points at dose1 = 10.0 results in high leverage.
+Grouping the data by lab, the relationships between dose1 and blot, dose2 and blot, and body and blot all include points with high leverage. We can easily see the points at dose1 = 10.0 have high leverage.
 ```{r}
 mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(blot = mean(blot))
 ggplot(data = mean_dat1, aes(x = dose1, y = blot, color = lab)) + geom_line() + ggtitle("Dose 1")
@@ -88,22 +88,19 @@ ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + 
 mean_body <- dat %>% group_by(lab, body) %>% summarise(blot = mean(blot))
 ggplot(data = mean_body, aes(x = body, y = blot, color = lab)) + geom_point(alpha = 0.5) + ggtitle("Body") + stat_smooth(alpha = 0.1)
 ```
-It is critical to counter the leverage in our regression model - we apply a log on these explanatory variables to account for this leverage. After, we notice that the plots are not exactly linear and it is wiser to include a polynomial to better fit the model.
+It is critical to counter the leverage in our regression model - a log on these explanatory variables was applied to account for this leverage. Additionally, the plots are not exactly linear and it is wiser to include a polynomial to better fit the model.
 ```{r}
 ggplot(data = dat, aes(x=(log(dose1 +1)^2), y=blot)) + geom_point()
 ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
 ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
 ```
 Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix this.
-Additionally, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. We treat this as a fixed effect and include this interaction influence in our final model.
 
-
-##Final Model: Linear Mixed Effect Model
 The final model used to capture the variability in the effects of the two doses on uterus weight across labs and other differences in protocol between labs was a Linear Mixed Effect Model. The random effects are dose 1 and dose 2 for each lab, and the fixed effects are dose 1, dose 2, body, and an interaction between protocol and lab. The response is the blotted uterus weight.
 
-We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, we also assumed that different types of protocol have a different effect for each labs. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix). 
+We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Additionally, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix).
 
-To better fit the model, transformations of the features and response were utilized. Originally the response varaible was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable, which significantly increased consistency of variance and provides a much more trustworthy model.
+To better fit the model, transformations of the features and response were utilized. Originally the response variable was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable, which significantly increased consistency of variance and provides a much more trustworthy model.
 
 #Assessing the Fit of the Final Model
 To understand how well the final model fit the data, we checked that the model met the linearity assumptions. 
