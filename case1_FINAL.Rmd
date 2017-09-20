@@ -165,7 +165,7 @@ A one unit increase in the blotted uterus weight of a rat in Lab ChungKorea, Pro
 
 
 #Recommendations
-Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences.
+Differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences.
 ```{r}
 ```
 
