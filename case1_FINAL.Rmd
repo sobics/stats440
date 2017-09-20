@@ -140,7 +140,7 @@ Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which mea
 To compare the variation between labs, we utilized Lab Basf, Protocol A as a baseline.
 
 #Differences Between Doses 
-
+The goodness-of-fit of the model suggested that there indeed existed variations in the effects of dose 1 and dose 2 between labs. 
 
 #Differences Between Protocols in Labs
 If the blotted uterus weight of a rat in Lab Basf, Protocol B increase by one unit, then we would expect a `r e^(.0415)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
