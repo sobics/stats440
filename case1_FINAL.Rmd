@@ -1,8 +1,10 @@
 ---
-title: "case1_FINAL"
+title: "Case 1"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 18, 2017"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r include = F}
@@ -56,8 +58,6 @@ dat <-  dat %>% filter(complete.cases(blot)) %>% select(-wet)
 
 #Introduction
 The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. 
-```{r}
-```
 
 #Methodology
 Our approach to answer our problem followed these 4 steps: \newline
