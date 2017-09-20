@@ -122,24 +122,33 @@ Checking the normality assumption via the QQ-plot, the points overall follow a s
 #Supplementary Goodness-of-Fit Checks
 To reaffirm that the model fits the data well, we added two goodness-of-fit checks: test & training data and RMSE. Although good indicators, it is important to note that relying solely on test & training data or RMSE to assess the goodness-of-fit of a model is not enough; we must ultimately rely on the linearity checks to ensure model fit.
 
-We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of `r mean(p_finmod - test)`. 
-```{r, cache = T}
+```{r, cache = T, warnings = F, echo = F}
 R4 <- NULL
+SD <- NULL
 for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
   test <- dat[samp,]
   train <- dat[-samp,]
   finmod <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
   p_finmod <- predict(finmod, test)
-  R4 <- rbind(R4, RMSE(exp(p_finmod)-1, test$blot))
+  SD <- rbind(SD, sd(log(test$blot + 1)))
+  R4 <- rbind(R4, RMSE(p_finmod, log(test$blot+1)))
 }
 ```
+We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of `r mean(abs((p_finmod) - log(test$blot+1)))`, which is less than one standard deviation of the response (`r mean(SD)`). 
 
 Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (`r mean(R4)`) utilizing this final model.
 
 #Discussion of Final Model
+To compare the variation between labs, we utilized Lab , Protocol A, dose 1, dose 2 as a baseline.
 ```{r}
+summary(fm)
 ```
+#Differences Between Doses in Labs
+
+#Differences Between Protocols in Labs
+
+
 -normality
 -residual diagnostics
 -every linear check possible
