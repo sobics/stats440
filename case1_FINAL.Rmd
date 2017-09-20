@@ -236,15 +236,6 @@ If the blotted uterus weight of a rat in Lab WIL, Protocol B increase by one uni
 
 If the blotted uterus weight of a rat in Lab Zeneca, Protocol A increase by one unit, then we would expect a `r e^(2.802688)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
-<<<<<<< HEAD
-<!---
--normality
--residual diagnostics
--every linear check possible
--what can we say about the variability between labs?-->
-=======
-
->>>>>>> 3d1959d2ac037c94c717963c437388cbc02713c1
 
 #Recommendations
 Differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences.
