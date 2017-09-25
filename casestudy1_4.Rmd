@@ -10,6 +10,8 @@ output: html_document
 #Read in the data
 ```{r}
 library(dplyr)
+library(lme4)
+library(ggplot2)
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
@@ -36,7 +38,7 @@ kern_distribution <- function(x,y, knots = 4, s = 2) {
 
 attach(dat) ##attaches the data so we can just run through with the variable names
 
-m2 <- lme4(blot ~ kern_distribution(dose1, blot) + kern_distribution(dose2, blot) + kern_distribution(body, blot), data = dat) #X + Z + R + S + random effect
+m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2, s = 1) + kern_distribution(dose2, blot, knots = 3, s = 1) + kern_distribution(body, blot, knots = 2, s = 1), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
 plot(x$dose1,y$blot)
@@ -55,3 +57,4 @@ plot(x,y)
 lines(x.predict, y.predict)
 
 ```
+
