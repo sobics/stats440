@@ -1,0 +1,235 @@
+---
+title: "Case 1- FINAL"
+author: "Ian Hua, InHee Ho, Sonia Xu"
+date: "September 18, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r include = F}
+library(dplyr)
+library(lme4)
+library(ggplot2)
+library(magrittr)
+#read in the data
+###plot multiple ggplots in one place  obtained from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
+dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
+dat <-  dat %>% filter(complete.cases(blot)) %>% select(-wet) 
+```
+
+#Introduction
+The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. 
+
+#Methodology
+Our approach to answer our problem followed these 4 steps: \newline
+1. Data-cleaning \newline
+2. Exploratory Data Analysis \newline
+3. Fitting the data to a Linear Mixed-Effect Model \newline
+4. Interpreting the data, model, and results \newline
+
+#Dataset
+The final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
+Three key pieces of data were removed: 4 observations due to missing data, the feature, group, due to multicollinearity, and the feature, wet, due to its variability in capturing the uterus weight. Below is a preview of the final dataset:
+```{r}
+head(dat)
+```
+
+##Final Model: Linear Mixed Effect Model
+#EDA and Choosing Explanatory Variables
+After thorough exploratory data analysis, we notice the differences in variance and mean of blot between labs. This hints towards heteroskedasticity in potential models which is addressed later in this section.
+```{r}
+ggplot(data = dat, aes(y = lab, x = blot, colour = lab)) + geom_point(alpha=0.05, size=10) + theme(legend.position="none")
+```
+Grouping the data by lab, the relationships between dose1 and blot, dose2 and blot, and body and blot all include points with high leverage. We can easily see the points at dose1 = 10.0 have high leverage.
+```{r}
+mean_dat1 <- dat %>% group_by(lab, dose1) %>% summarise(blot = mean(blot))
+ggplot(data = mean_dat1, aes(x = dose1, y = blot, color = lab)) + geom_line() + ggtitle("Dose 1")
+mean_dat2 <- dat %>% group_by(lab, dose2) %>% summarise(blot = mean(blot))
+ggplot(data = mean_dat2, aes(x = dose2, y = blot, color = lab)) + geom_line() + ggtitle("Dose 2")
+mean_body <- dat %>% group_by(lab, body) %>% summarise(blot = mean(blot))
+ggplot(data = mean_body, aes(x = body, y = blot, color = lab)) + geom_point(alpha = 0.5) + ggtitle("Body") + stat_smooth(alpha = 0.1)
+```
+It is critical to counter the leverage in our regression model - a log on these explanatory variables was applied to account for this leverage. Additionally, the plots are not exactly linear and it is wiser to include a polynomial to better fit the model.
+```{r}
+ggplot(data = dat, aes(x=(log(dose1 +1)^2), y=blot)) + geom_point()
+ggplot(data = dat, aes((log(dose1 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 1, col="blue") 
+ggplot(data = dat, aes((log(dose2 +1)^2))) + geom_histogram(fill = "blue", alpha = 0.2, binwidth = 0.2, col="blue") 
+```
+Thus we use $log(dose1)^2$, $log(dose2)^2$, $log(body)^2$ in our model to fix this.
+
+The final model used to capture the variability in the effects of the two doses on uterus weight across labs and other differences in protocol between labs was a Linear Mixed Effect Model. The random effects are dose 1 and dose 2 for each lab, and the fixed effects are dose 1, dose 2, body, and an interaction between protocol and lab. The response is the blotted uterus weight.
+
+We noticed that adding dose1 and dose2 as both fixed and random effects better fits the data. The fixed effect captures the population effects of dose1 and dose2 across all labs and random effect captures the variation in the effects of dose1 and dose2 between labs. Similarly, it is likely that the protocols at each lab differ due to a multitude of reasons, including environmental, procedural, governmental, etc. After fitting the model with the interaction between protocol and lab (proto*lab) and with the random effects of protocol on each labs (proto|lab) respectively, we observed that the former better fits the actual dataset (see Appendix).
+
+To better fit the model, transformations of the features and response were utilized. Originally the response variable was simply blot - this was incorrect due to differences in scale in addition to heteroskedasticity in the model. This was corrected in the final model using $log(blot+1)$ as the response variable, which significantly increased consistency of variance and provides a much more trustworthy model.
+
+#Assessing the Fit of the Final Model
+To understand how well the final model fit the data, we checked that the model met the linearity assumptions. 
+
+```{r}
+fm <- lmer(log(blot+1) ~ (1 + poly(log(dose1 + 1),2) + poly(log(dose2 + 1),2) |lab) + poly(log(dose1 + 1),2) + poly(log(dose2+1),2) + poly(log(body),2) + (proto*lab), dat)
+par(mfrow= c(1,2))
+plot(fm, main = "Residuals vs Fitted", xlab = "fitted", ylab = "residuals")
+```
+Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points are randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
+```{r}
+qqnorm(resid(fm))
+```
+Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
+
+#Supplementary Goodness-of-Fit Checks
+To reaffirm that the model fits the data well, we added two goodness-of-fit checks: test & training data and RMSE. Although good indicators, it is important to note that relying solely on test & training data or RMSE to assess the goodness-of-fit of a model is not enough; we must ultimately rely on the linearity checks to ensure model fit.
+
+We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of 0.17, which is less than one standard deviation of the response 0.8. Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (0.17) utilizing this final model.
+
+#Discussion of Final Model
+To compare the variation between labs, we utilized Lab Basf, Protocol A as a baseline.
+
+#Differences Between Doses 
+The goodness-of-fit of the model suggested that there indeed existed variations in the effects of dose 1 and dose 2 between labs. 
+
+#Differences Between Protocols in Labs
+If the blotted uterus weight of a rat in Lab Basf, Protocol B increase by one unit, then we would expect a `r e^(.0415)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Basf, Protocol C increase by one unit, then we would expect a `r e^(.49699)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Basf, Protocol D increase by one unit, then we would expect a `r e^(.878588)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Basf, Protocol D increase by one unit, then we would expect a `r e^(.878588)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Bayer, Protocol A increase by one unit, then we would expect a `r e^(1.270338)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Berlin, Protocol A increase by one unit, then we would expect a `r e^(1.595)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab ChungKorea, Protocol A increase by one unit, then we would expect a `r e^(3.16174)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab ChungKorea, Protocol B increase by one unit, then we would expect a `r e^(.094434)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citifrance, Protocol A increase by one unit, then we would expect a `r e^(1.8935)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol A increase by one unit, then we would expect a `r e^(1.6738)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol B increase by one unit, then we would expect a `r e^(.-.018317)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol C increase by one unit, then we would expect a `r e^(.1677)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Denmark, Protocol A increase by one unit, then we would expect a `r e^(2.407)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Exxon, Protocol A increase by one unit, then we would expect a `r e^(2.276)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Hatano, Protocol A increase by one unit, then we would expect a `r e^(0.7469)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Hatano, Protocol B increase by one unit, then we would expect a `r e^(.042518)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Hatano, Protocol C increase by one unit, then we would expect a `r e^(0.297668)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Hatano, Protocol D increase by one unit, then we would expect a `r e^(.-.085247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab Huntingdon, Protocol A increase by one unit, then we would expect a `r e^(-.800793)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol A increase by one unit, then we would expect a `r e^(1.952455)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol B increase by one unit, then we would expect a `r e^(-.015247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol C increase by one unit, then we would expect a `r e^(.040620)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol D increase by one unit, then we would expect a `r e^(-.449460)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab KoreaPark, Protocol A increase by one unit, then we would expect a `r e^(-0.426437)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab KoreaPark, Protocol B increase by one unit, then we would expect a `r e^(-.34459)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol A increase by one unit, then we would expect a `r e^(1.869946)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol B increase by one unit, then we would expect a `r e^(.0795)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol C increase by one unit, then we would expect a `r e^(.2308)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol D increase by one unit, then we would expect a `r e^(-0.174488)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol A increase by one unit, then we would expect a `r e^(1.1847)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol B increase by one unit, then we would expect a `r e^(0.163999)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol C increase by one unit, then we would expect a `r e^(0.399065)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Poulenc, Protocol A increase by one unit, then we would expect a `r e^(1.947473)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol A increase by one unit, then we would expect a `r e^(2.078054)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol B increase by one unit, then we would expect a `r e^(0.073632)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol C increase by one unit, then we would expect a `r e^(0.223010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab TNO, Protocol A increase by one unit, then we would expect a `r e^(1.456648-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab TNO, Protocol B increase by one unit, then we would expect a `r e^(0.158715)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab WIL, Protocol A increase by one unit, then we would expect a `r e^(0.712088)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab WIL, Protocol B increase by one unit, then we would expect a `r e^(-0.008010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+
+If the blotted uterus weight of a rat in Lab Zeneca, Protocol A increase by one unit, then we would expect a `r e^(2.802688)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+
+#Recommendations
+Differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. The lab with the largest differences in blotted uterus weight compared to that of Lab Basf, Protocol A was Lab InEnvTox, Procol D.
+
+Of course, the effects of the two doses vary between labs as well.
+
+To avoid this problem altogether, we recommend that this assay would be best conducted in one lab and one protocol to ensure consistency in the results. 
+
+#Appendix
+Summary Statistics of the Final Model are below:
+```{r}
+summary(fm)
+```
