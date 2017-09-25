@@ -6,27 +6,37 @@ output: html_document
 ---
 
 ##An Attempt at a Non-linear Model
-```{r}
 
+#Read in the data
+```{r}
+library(dplyr)
+dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
+dat <-  dat %>% filter(complete.cases(blot)) 
+```
+
+
+
+
+```{r}
 #Replace dose 1 with this 
-x <- rt(500,3) #squiggly data #be careful of random samples--Big X can't have NAs
-y <- sin(.5*x) + rnorm(500, 0, 0.3)
-knots <- 10 #number of peaks
+x <- dat %>% select(dose1)#squiggly data #be careful of random samples--Big X can't have NAs
+y <- dat %>% select(blot)
+knots <- 4 #number of peaks
 tau <- seq(min(x), max(x), length.out = knots)
 s <- 2 #controls how wide the kernels are, s should be half the distance between two knots diff(tau)[1]/2
 
 #create this for each covariate
 
-X <- matrix(0, nrow=500,ncol=knots)
+X <- matrix(0, nrow=length(x$dose1),ncol=knots)
 for(i in 1:knots) {
-  X[,i] <- x * dnorm(x, tau[i], s)
+  X[,i] <- x$dose1 * dnorm(x$dose1, tau[i], s)
 }
 
-m2 <- lm(y ~ X) #X + Z + R + S + random effect
+m2 <- lm(y$blot ~ X) #X + Z + R + S + random effect
 summary(m2)
 
-plot(x,y)
-lines(sort(x), m2$fitted.values[order(x)])
+plot(x$dose1,y$blot)
+lines(sort(x$dose1), m2$fitted.values[order(x$dose1)])
 abline(v = tau)
 
 #smoothing out the graph
