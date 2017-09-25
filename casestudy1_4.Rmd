@@ -54,7 +54,7 @@ smooth_graph <- function(x, y.predict, knots = 4) {
 
 #attach(dat) ##attaches the data so we can just run through with the variable names
 
-m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2) + kern_distribution(dose2, blot, knots = 3) + kern_distribution(body, blot, knots = 10), data = dat) #X + Z + R + S + random effect
+m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2) + kern_distribution(dose2, blot, knots = 3) + kern_distribution(body, blot, knots = 3), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
 
@@ -73,10 +73,14 @@ lines(sort(dat$body), fitted(m2)[order(dat$body)])
 
 
 #smoothing out the graph
-
-y.predict <- cbind(1, X.predict) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
+m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, blot, knots = 2) + smooth_graph(dose2, blot, knots = 3) + smooth_graph(body, blot, knots = 3), data = dat) #X + Z + R + S + random effect
+summary(m2)
+y.predict <- predict(m2, dat)
+  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
 plot(x$dose2,y$blot)
 
 
 ```
+
+##categorical variable for body?
 
