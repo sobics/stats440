@@ -38,7 +38,9 @@ kern_distribution <- function(x,y, knots = 4) {
 
 #smoothing out the graph by predicting values for the fitted data
 #same function as the kern distribution, but this time it is smoother
-smooth_graph <- function(x, y.predict, knots = 4, s = 2) {
+smooth_graph <- function(x, y.predict, knots = 4) {
+  tau <- seq(min(x), max(x), length.out = knots)
+  s <- diff(tau)[1]/2
   x.predict <- seq(min(x), max(x), length.out=500)
   X.predict <- matrix(0, nrow=length(x.predict),ncol = knots)
   for(i in 1:knots) {
