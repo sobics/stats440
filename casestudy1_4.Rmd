@@ -14,23 +14,28 @@ dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
 
-
-
-
+```{r}
+#creates a kernel distribution for each covariate
+kern_distribution <- function(x,y, knots = 4, s = 2) {
+  ### s: #controls how wide the kernels are, s should be half the distance between two knots 
+  ### tau: decides where the breaks are based on the number of knots
+  ###knots: number of splits in the data
+  ##x and y are the data
+  
+  tau <- seq(min(x), max(x), length.out = knots)
+  X <- matrix(0, nrow=length(x),ncol=knots)
+  for(i in 1:knots) {
+    X[,i] <- x * dnorm(x, tau[i], s)
+  }
+  return(X)
+}
+```
+#Kernel Distributions
 ```{r}
 #Replace dose 1 with this 
 x <- dat %>% select(dose1)#squiggly data #be careful of random samples--Big X can't have NAs
 y <- dat %>% select(blot)
 knots <- 4 #number of peaks
-tau <- seq(min(x), max(x), length.out = knots)
-s <- 2 #controls how wide the kernels are, s should be half the distance between two knots diff(tau)[1]/2
-
-#create this for each covariate
-
-X <- matrix(0, nrow=length(x$dose1),ncol=knots)
-for(i in 1:knots) {
-  X[,i] <- x$dose1 * dnorm(x$dose1, tau[i], s)
-}
 
 m2 <- lm(y$blot ~ X) #X + Z + R + S + random effect
 summary(m2)
