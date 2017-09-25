@@ -54,14 +54,17 @@ smooth_graph <- function(x, y.predict, knots = 4, s = 2) {
 m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2) + kern_distribution(dose2, blot, knots = 3) + kern_distribution(body, blot, knots = 10), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
-plot(dat$dose2, log(dat$blot))
+
+plot(dat$dose1,log(dat$blot + 1)) #plots the true data
+lines(sort(dat$dose1), fitted(m2)[order(dat$dose1)]) #shows how well the model fits the true data
+abline(v = tau)
+
+plot(dat$dose2, log(dat$blot + 1))
 lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
 #abline(v = tau)
 
-plot(dat$dose1, log(dat$blot))
-lines(sort(dat$dose1), fitted(m2)[order(dat$dose1)])
 
-plot(dat$body, log(dat$blot))
+plot(dat$body, log(dat$blot + 1))
 lines(sort(dat$body), fitted(m2)[order(dat$body)])
 
 
