@@ -1,0 +1,43 @@
+---
+title: "Case 1 Take 4"
+author: "Ian Hua, InHee Ho, Sonia Xu"
+date: "September 25, 2017"
+output: html_document
+---
+
+##An Attempt at a Non-linear Model
+```{r}
+
+#Replace dose 1 with this 
+x <- rt(500,3) #squiggly data #be careful of random samples--Big X can't have NAs
+y <- sin(.5*x) + rnorm(500, 0, 0.3)
+knots <- 10 #number of peaks
+tau <- seq(min(x), max(x), length.out = knots)
+s <- 2 #controls how wide the kernels are, s should be half the distance between two knots diff(tau)[1]/2
+
+#create this for each covariate
+
+X <- matrix(0, nrow=500,ncol=knots)
+for(i in 1:knots) {
+  X[,i] <- x * dnorm(x, tau[i], s)
+}
+
+m2 <- lm(y ~ X) #X + Z + R + S + random effect
+summary(m2)
+
+plot(x,y)
+lines(sort(x), m2$fitted.values[order(x)])
+abline(v = tau)
+
+#smoothing out the graph
+x.predict <- seq(min(x), max(x), length.out=500) #splits data into event little groups
+X.predict <- matrix(0, nrow=500,ncol = knots)
+for(i in 1:knots) {
+  X.predict[,i] <- x.predict * dnorm(x.predict, tau[i], s)
+}
+y.predict <- cbind(1, X.predict) %*% coef(m2) + cbind #predict function is easier // but cbind(X.predicts)
+plot(x,y)
+
+lines(x.predict, y.predict)
+
+```
