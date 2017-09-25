@@ -16,10 +16,11 @@ dat <-  dat %>% filter(complete.cases(blot))
 
 ```{r}
 #creates a kernel distribution for each covariate
+#be careful of random samples--Big X can't have NAs
 kern_distribution <- function(x,y, knots = 4, s = 2) {
   ### s: #controls how wide the kernels are, s should be half the distance between two knots 
   ### tau: decides where the breaks are based on the number of knots
-  ###knots: number of splits in the data
+  ###knots: number of splits/peaks in the data
   ##x and y are the data
   
   tau <- seq(min(x), max(x), length.out = knots)
@@ -32,12 +33,10 @@ kern_distribution <- function(x,y, knots = 4, s = 2) {
 ```
 #Kernel Distributions
 ```{r}
-#Replace dose 1 with this 
-x <- dat %>% select(dose1)#squiggly data #be careful of random samples--Big X can't have NAs
-y <- dat %>% select(blot)
-knots <- 4 #number of peaks
 
-m2 <- lm(y$blot ~ X) #X + Z + R + S + random effect
+attach(dat) ##attaches the data so we can just run through with the variable names
+
+m2 <- lme4(blot ~ kern_distribution(dose1, blot) + kern_distribution(dose2, blot) + kern_distribution(body, blot), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
 plot(x$dose1,y$blot)
