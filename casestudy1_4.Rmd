@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ##An Attempt at a Non-linear Model
+Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we decided to capture the non-linearity of dose 1 and dose 2 via kernel regression. We also noted that body exhibited non-linear trends, so we also decided to model this feature via kernel regression.
 
 #Read in the data
 ```{r}
@@ -72,11 +73,7 @@ lines(sort(dat$body), fitted(m2)[order(dat$body)])
 
 
 #smoothing out the graph
-x.predict <- seq(min(x), max(x), length.out=500) #splits data into event little groups
-X.predict <- matrix(0, nrow=500,ncol = knots)
-for(i in 1:knots) {
-  X.predict[,i] <- x.predict * dnorm(x.predict, tau[i], s)
-}
+
 y.predict <- cbind(1, X.predict) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
 plot(x$dose2,y$blot)
 
