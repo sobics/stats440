@@ -21,7 +21,7 @@ dat <-  dat %>% filter(complete.cases(blot))
 ```{r}
 #creates a kernel distribution for each covariate
 #be careful of random samples--Big X can't have NAs
-kern_distribution <- function(x,y, knots = 4) {
+kern_distribution <- function(x,knots = 4) {
   ### s: #controls how wide the kernels are, s should be half the distance between two knots 
   ### tau: decides where the breaks are based on the number of knots
   ###knots: number of splits/peaks in the data
@@ -38,10 +38,10 @@ kern_distribution <- function(x,y, knots = 4) {
 
 #smoothing out the graph by predicting values for the fitted data
 #same function as the kern distribution, but this time it is smoother
-smooth_graph <- function(x, y.predict, knots = 4) {
+smooth_graph <- function(x,knots = 4) {
   tau <- seq(min(x), max(x), length.out = knots)
   s <- diff(tau)[1]/2
-  x.predict <- seq(min(x), max(x), length.out=500)
+  x.predict <- seq(min(x), max(x), length.out=length(x))
   X.predict <- matrix(0, nrow=length(x.predict),ncol = knots)
   for(i in 1:knots) {
     X.predict[,i] <- x.predict * dnorm(x.predict, tau[i], s)
@@ -54,7 +54,7 @@ smooth_graph <- function(x, y.predict, knots = 4) {
 
 #attach(dat) ##attaches the data so we can just run through with the variable names
 
-m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2) + kern_distribution(dose2, blot, knots = 3) + kern_distribution(body, blot, knots = 3), data = dat) #X + Z + R + S + random effect
+m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, knots = 3) + kern_distribution(dose2, knots = 3) + kern_distribution(body, knots = 3), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
 
@@ -70,17 +70,16 @@ lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
 plot(dat$body, log(dat$blot + 1))
 lines(sort(dat$body), fitted(m2)[order(dat$body)])
 
-
-
-#smoothing out the graph
-m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, blot, knots = 2) + smooth_graph(dose2, blot, knots = 3) + smooth_graph(body, blot, knots = 3), data = dat) #X + Z + R + S + random effect
-summary(m2)
-y.predict <- predict(m2, dat)
-  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
-plot(x$dose2,y$blot)
-
-
 ```
+
+#smooth version
+```{r}
+m3 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, knots = 3) + smooth_graph(dose2, knots = 3) + smooth_graph(body, knots = 3), data = dat) #X + Z + R + S + random effect
+summary(m3)
+y.predict <- predict(m3, dat)
+  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
+plot(dat$dose2,log(dat$blot+1))
+lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
 
 ##categorical variable for body?
 
