@@ -12,6 +12,7 @@ output: html_document
 library(dplyr)
 library(lme4)
 library(ggplot2)
+library(magrittr)
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
@@ -19,13 +20,14 @@ dat <-  dat %>% filter(complete.cases(blot))
 ```{r}
 #creates a kernel distribution for each covariate
 #be careful of random samples--Big X can't have NAs
-kern_distribution <- function(x,y, knots = 4, s = 2) {
+kern_distribution <- function(x,y, knots = 4) {
   ### s: #controls how wide the kernels are, s should be half the distance between two knots 
   ### tau: decides where the breaks are based on the number of knots
   ###knots: number of splits/peaks in the data
   ##x and y are the data
   
   tau <- seq(min(x), max(x), length.out = knots)
+  s <- diff(tau)[1]/2
   X <- matrix(0, nrow=length(x),ncol=knots)
   for(i in 1:knots) {
     X[,i] <- x * dnorm(x, tau[i], s)
@@ -38,12 +40,20 @@ kern_distribution <- function(x,y, knots = 4, s = 2) {
 
 attach(dat) ##attaches the data so we can just run through with the variable names
 
-m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2, s = 1) + kern_distribution(dose2, blot, knots = 3, s = 1) + kern_distribution(body, blot, knots = 2, s = 1), data = dat) #X + Z + R + S + random effect
+m2 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, blot, knots = 2) + kern_distribution(dose2, blot, knots = 3) + kern_distribution(body, blot, knots = 10), data = dat) #X + Z + R + S + random effect
 summary(m2)
 
-plot(x$dose1,y$blot)
-lines(sort(x$dose1), m2$fitted.values[order(x$dose1)])
-abline(v = tau)
+plot(dat$dose2, log(dat$blot))
+lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
+#abline(v = tau)
+
+plot(dat$dose1, log(dat$blot))
+lines(sort(dat$dose1), fitted(m2)[order(dat$dose1)])
+
+plot(dat$body, log(dat$blot))
+lines(sort(dat$body), fitted(m2)[order(dat$body)])
+
+
 
 #smoothing out the graph
 x.predict <- seq(min(x), max(x), length.out=500) #splits data into event little groups
@@ -51,10 +61,10 @@ X.predict <- matrix(0, nrow=500,ncol = knots)
 for(i in 1:knots) {
   X.predict[,i] <- x.predict * dnorm(x.predict, tau[i], s)
 }
-y.predict <- cbind(1, X.predict) %*% coef(m2) + cbind #predict function is easier // but cbind(X.predicts)
-plot(x,y)
+y.predict <- cbind(1, X.predict) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
+plot(x$dose2,y$blot)
 
-lines(x.predict, y.predict)
+lines(x$dose2, y.predict)
 
 ```
 
