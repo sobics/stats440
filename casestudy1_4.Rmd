@@ -110,9 +110,9 @@ summary(m4)
 ```{r}
 plot(m4, main = 'Residuals vs. Fitted', xlab = "Fitted", ylab = "Residuals")
 ```
-
-Looking at the residuals vs. fitted, this graph 
+Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points are randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
 
 ```{r}
 qqnorm(resid(m4))
 ```
+Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
