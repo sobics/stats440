@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ##An Attempt at a Non-linear Model
-Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we decided to capture the non-linearity of dose 1 and dose 2 via kernel regression. We also noted that body exhibited non-linear trends, so we also decided to model this feature via kernel regression.
+Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we decided to capture the non-linearity of dose 1 and dose 2 via kernel regression. We also noted that body exhibited non-linear trends, so we also decided to model this feature via kernel regression. However, clustering body into 3 segments produced better predictive results.
 
 #Read in the data
 ```{r}
