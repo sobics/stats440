@@ -80,6 +80,23 @@ y.predict <- predict(m3, dat)
   #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
 plot(dat$dose2,log(dat$blot+1))
 lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
-
+```
 ##categorical variable for body?
+#maybe we can split body into 2 bins, and use that to predict body weight
+```{r}
+library(cluster)
+set.seed(20)
+bodyCluster <- kmeans(dat[, c(6,8)], 3, nstart = 20)
+
+bodyCluster$cluster <- as.factor(bodyCluster$cluster)
+ggplot(dat, aes(body, blot, color = bodyCluster$cluster)) + geom_point()
+
+#Splits the body weight into 3 bins...
+##add it back to the data & replace body with these 3 groups
+
+dat$bodyClust <- bodyCluster$cluster
+m4 <- lmer(log(blot + 1) ~ (1 + proto|lab) + kern_distribution(dose1, knots = 3) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) #X + Z + R + S + random effect
+summary(m4)
+```
+
 
