@@ -132,7 +132,9 @@ for(i in 1: 100) {
   R4 <- rbind(R4, RMSE(p_finmod, log(test$blot+1)))
 }
 ```
-We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of `r mean(abs(p_finmod - log(test$blot+1)))`, which is less than one standard deviation of the response `r mean(SD)`. Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (`r mean(R4)`) utilizing this final model.
+We decided to split the cleaned dataset from our first write-up into test and training data. We fit the model on the training data to see how well it fits our test data. Our test data is 1/10 of the full dataset. We sampled/fit the test and training data for 100 iterations for each model in an effort to normalize the performance of the models. After 100 iterations, the training data predicted the blotted weight of the test data with an average error of `r mean(abs((p_finmod) - log(test$blot+1)))`, which is less than one standard deviation of the response (`r mean(SD)`). 
+
+Another goodness-of-fit measurement is Root Mean Squared Error (RMSE), which measures the difference between the predicted response from a model and the true response of the dataset. The lower the RMSE, the better the model fits the data. Compared to other models explored, our group found the lowest RMSE (`r mean(R4)`) utilizing this final model.
 
 #Discussion of Final Model
 To compare the variation between labs, we utilized Lab Basf, Protocol A as a baseline.
@@ -141,94 +143,102 @@ To compare the variation between labs, we utilized Lab Basf, Protocol A as a bas
 The goodness-of-fit of the model suggested that there indeed existed variations in the effects of dose 1 and dose 2 between labs. 
 
 #Differences Between Protocols in Labs
-If the blotted uterus weight of a rat in Lab Basf, Protocol B increase by one unit, then we would expect a `r exp(0.0415)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Basf, Protocol B increase by one unit, then we would expect a `r e^(.0415)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
-If the blotted uterus weight of a rat in Lab Basf, Protocol C increase by one unit, then we would expect a `r exp(0.49699)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Basf, Protocol C increase by one unit, then we would expect a `r e^(.49699)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
-If the blotted uterus weight of a rat in Lab Basf, Protocol D increase by one unit, then we would expect a `r exp(0.878588)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-
-If the blotted uterus weight of a rat in Lab Bayer, Protocol A increase by one unit, then we would expect a `r exp(1.270338)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Berlin, Protocol A increase by one unit, then we would expect a `r exp(1.595)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab ChungKorea, Protocol A increase by one unit, then we would expect a `r exp(3.16174)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab ChungKorea, Protocol B increase by one unit, then we would expect a `r exp(0.094434)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Citifrance, Protocol A increase by one unit, then we would expect a `r exp(1.8935)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Citijapan, Protocol A increase by one unit, then we would expect a `r exp(1.6738)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Citijapan, Protocol B increase by one unit, then we would expect a `r exp(-.018317)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Basf, Protocol D increase by one unit, then we would expect a `r e^(.878588)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Citijapan, Protocol C increase by one unit, then we would expect a `r exp(0.1677)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Denmark, Protocol A increase by one unit, then we would expect a `r exp(2.407)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Exxon, Protocol A increase by one unit, then we would expect a `r exp(2.276)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Basf, Protocol D increase by one unit, then we would expect a `r e^(.878588)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Hatano, Protocol A increase by one unit, then we would expect a `r exp(0.7469)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Bayer, Protocol A increase by one unit, then we would expect a `r e^(1.270338)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Berlin, Protocol A increase by one unit, then we would expect a `r e^(1.595)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab ChungKorea, Protocol A increase by one unit, then we would expect a `r e^(3.16174)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab ChungKorea, Protocol B increase by one unit, then we would expect a `r e^(.094434)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citifrance, Protocol A increase by one unit, then we would expect a `r e^(1.8935)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol A increase by one unit, then we would expect a `r e^(1.6738)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol B increase by one unit, then we would expect a `r e^(.-.018317)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Hatano, Protocol B increase by one unit, then we would expect a `r exp(0.042518)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Citijapan, Protocol C increase by one unit, then we would expect a `r e^(.1677)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Denmark, Protocol A increase by one unit, then we would expect a `r e^(2.407)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Exxon, Protocol A increase by one unit, then we would expect a `r e^(2.276)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Hatano, Protocol C increase by one unit, then we would expect a `r exp(0.297668)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Hatano, Protocol A increase by one unit, then we would expect a `r e^(0.7469)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Hatano, Protocol D increase by one unit, then we would expect a `r exp(-.085247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Hatano, Protocol B increase by one unit, then we would expect a `r e^(.042518)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab Huntingdon, Protocol A increase by one unit, then we would expect a `r exp(-.800793)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab InEnvTox, Protocol A increase by one unit, then we would expect a `r exp(1.952455)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab InEnvTox, Protocol B increase by one unit, then we would expect a `r exp(-.015247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Hatano, Protocol C increase by one unit, then we would expect a `r e^(0.297668)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
 
-If the blotted uterus weight of a rat in Lab InEnvTox, Protocol C increase by one unit, then we would expect a `r exp(.040620)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Hatano, Protocol D increase by one unit, then we would expect a `r e^(.-.085247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
-If the blotted uterus weight of a rat in Lab InEnvTox, Protocol D increase by one unit, then we would expect a `r exp(-.449460)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab KoreaPark, Protocol A increase by one unit, then we would expect a `r exp(-0.426437)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab KoreaPark, Protocol B increase by one unit, then we would expect a `r exp(-.34459)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol A increase by one unit, then we would expect a `r exp(1.869946)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol B increase by one unit, then we would expect a `r exp(.0795)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol C increase by one unit, then we would expect a `r exp(.2308)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol D increase by one unit, then we would expect a `r exp(-0.174488)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Nihon, Protocol A increase by one unit, then we would expect a `r exp(1.1847)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Nihon, Protocol B increase by one unit, then we would expect a `r exp(0.163999)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Nihon, Protocol C increase by one unit, then we would expect a `r exp(0.399065)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Poulenc, Protocol A increase by one unit, then we would expect a `r exp(1.947473)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Sumitomo, Protocol A increase by one unit, then we would expect a `r exp(2.078054)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Sumitomo, Protocol B increase by one unit, then we would expect a `r exp(0.073632)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab Sumitomo, Protocol C increase by one unit, then we would expect a `r exp(0.223010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab TNO, Protocol A increase by one unit, then we would expect a `r exp(1.456648)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab TNO, Protocol B increase by one unit, then we would expect a `r exp(0.158715)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab WIL, Protocol A increase by one unit, then we would expect a `r exp(0.712088)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
-\newline
-If the blotted uterus weight of a rat in Lab WIL, Protocol B increase by one unit, then we would expect a `r exp(-0.008010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 
-If the blotted uterus weight of a rat in Lab Zeneca, Protocol A increase by one unit, then we would expect a `r exp(2.802688)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+If the blotted uterus weight of a rat in Lab Huntingdon, Protocol A increase by one unit, then we would expect a `r e^(-.800793)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
 \newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol A increase by one unit, then we would expect a `r e^(1.952455)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol B increase by one unit, then we would expect a `r e^(-.015247)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol C increase by one unit, then we would expect a `r e^(.040620)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab InEnvTox, Protocol D increase by one unit, then we would expect a `r e^(-.449460)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab KoreaPark, Protocol A increase by one unit, then we would expect a `r e^(-0.426437)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab KoreaPark, Protocol B increase by one unit, then we would expect a `r e^(-.34459)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol A increase by one unit, then we would expect a `r e^(1.869946)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol B increase by one unit, then we would expect a `r e^(.0795)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol C increase by one unit, then we would expect a `r e^(.2308)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Mitsubishi, Protocol D increase by one unit, then we would expect a `r e^(-0.174488)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol A increase by one unit, then we would expect a `r e^(1.1847)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol B increase by one unit, then we would expect a `r e^(0.163999)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Nihon, Protocol C increase by one unit, then we would expect a `r e^(0.399065)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Poulenc, Protocol A increase by one unit, then we would expect a `r e^(1.947473)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol A increase by one unit, then we would expect a `r e^(2.078054)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol B increase by one unit, then we would expect a `r e^(0.073632)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab Sumitomo, Protocol C increase by one unit, then we would expect a `r e^(0.223010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab TNO, Protocol A increase by one unit, then we would expect a `r e^(1.456648-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab TNO, Protocol B increase by one unit, then we would expect a `r e^(0.158715)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab WIL, Protocol A increase by one unit, then we would expect a `r e^(0.712088)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+If the blotted uterus weight of a rat in Lab WIL, Protocol B increase by one unit, then we would expect a `r e^(-0.008010)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+
+If the blotted uterus weight of a rat in Lab Zeneca, Protocol A increase by one unit, then we would expect a `r e^(2.802688)-1` unit increase in the blotted uterus weight of a rat in Lab Basf, Protocol A. 
+\newline
+<!---
+-normality
+-residual diagnostics
+-every linear check possible
+-what can we say about the variability between labs?-->
 
 
 #Recommendations

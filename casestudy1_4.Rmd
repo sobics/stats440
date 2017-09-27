@@ -3,10 +3,11 @@ title: "Case 1 Take 4"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 25, 2017"
 output:
+  word_document: default
   pdf_document: default
   html_document: default
-  word_document: default
 ---
+
 ```{r echo = F}
 library(dplyr)
 library(lme4)
@@ -36,15 +37,20 @@ kable(head(dat))
 
 ##Final Model: Linear Mixed Effect Model
 
-#Transitioning from General Transformations
-Previously, we attempted to model the non-linearity of dose 1 and dose 2 by modeling these features as polynomials with a degree of 2. However, modeling these features as polynomials did not fully capture their distribution against the response, blot. Our previous final model, overall, fit the data well according to the qq-plot and residual vs. fitted graph. However, we show below that we can better fit a model by fitting dose 1 and dose 2 via kernel estimations and by transforming body into a categorical variable via k-means clustering (k = 3). Below is an explanation of our updated final model. 
+#Transitioning from the Linear Mixed Effects Model
+In our previous report, we attempted to handle the non-linearity of dose 1 and dose 2 by taking their logarithms and modeling as polynomials with a degree of 2. Overall, our previous final model fitted the data well according to the qq-plot and residual vs. fitted graph. However, using second-degree polynomials of the logarithmized values of dose 1 and dose 2 did not fully capture the uneven distribution of dose 1 and dose 2 against the response, blotted uterus weight. We can better fit the model using kernel regression and clustering. We present below our updated final model that applies kernel estimations to dose 1 and dose 2 and transforms body weight into a categorical variable via k-means clustering, and how the model better predicts our response.
+
+#Exploratory Data Analysis
+We continued from our previous report with our choices of explanatory variables. We detected significant heteroscedasticity in our response variable (blotted uterus weight) between labs, and took their logarithms for more consistent variance. Furthermore, protocols can have different effects on the response depending on the labs. We capture such difference by fitting random effects proto|lab. Finally, to capture the effects of doses of chemical 1 and 2 across all labs as well as their variation between labs, we added dose 1 and dose 2 as both fixed and random effects. However, we used different methods to better capture the distributions of dose 1, dose 2, and body weight.
+
 
 ##Capturing the Non-Linearity of Dose 1 and Dose 2
-Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we decided to capture the non-linearity of dose 1 and dose 2 via kernel regression. Below are plots of how the kernel distribution fits against the true data for dose 1 and dose 2.
+In order to capture the non-linearity of the distribution of dose 1 and dose 2, we decided to use kernel regression instead of modeling with second-degree polynomials of logarithmized values. We use 4 knots for dose 1 and 3 knots for dose 2.
 
 
 ```{r include = F}
 #Read in the data
+
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
@@ -101,7 +107,11 @@ lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
 
 ```
 ##Transforming Body into a Categorical Variable
-Looking at the scatterplot between body and blotted uterus weight, there are two distinct groups for body weight. These groups are non-linear, so it would be best to distinguish them in an unsupervised fashion. K-means clustering with 3 groups resulted in the best segmentation of the data, and these groups (1,2,3) replaced the continuous variable of body weight for the final model. Below is a plot of the 3 different clusters.
+```{r, echo=F}
+ggplot(data = dat, aes(x=body, y=blot, color=lab))+geom_point(alpha=0.5)
+```
+
+Looking at the scatterplot above between body and blotted uterus weight, we observe two distinct groups of body weight. These groups are non-linear, so it would be best to distinguish them in an unsupervised fashion. K-means clustering with 3 groups resulted in the best segmentation of the data, and these groups (1,2,3) replaced the continuous variable of body weight for the final model. Below is a plot of the 3 different clusters.
 ```{r echo = F}
 library(cluster)
 set.seed(20)
@@ -120,14 +130,11 @@ dat$bodyClust <- bodyCluster$cluster
 #smooth version
 m3 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, knots = 3) + smooth_graph(dose2, knots = 3) + smooth_graph(body, knots = 3), data = dat) #X + Z + R + S + random effect
 summary(m3)
-y.predict <- predict(m3, dat)
-  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
-plot(dat$dose2,log(dat$blot+1))
-lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
+
 ```
 
 #The Updated Final Model
-Thus, the updated final model still contains the log of blotted uterus weights as the response, transformations of dose 1, dose 2, and body as noted above, and random effects for protocol, dose 1, and dose 2 between labs.
+Thus, our updated final model still has the log of blotted uterus weights as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. But dose 1, dose 2, and body weight now reflect the transformations as noted above.
 ```{r}
 m4 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
 #X + Z + R + S + random effect
