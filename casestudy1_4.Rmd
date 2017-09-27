@@ -133,6 +133,6 @@ for(i in 1: 100) {
 }
 ```
 
-By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of after 100 iterations.
+By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of `r mean(R5)`after 100 iterations.
 
 
