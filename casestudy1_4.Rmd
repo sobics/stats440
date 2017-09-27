@@ -23,6 +23,7 @@ library(dplyr)
 library(lme4)
 library(ggplot2)
 library(magrittr)
+RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
