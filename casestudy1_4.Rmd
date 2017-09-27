@@ -103,7 +103,7 @@ lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
 #The Updated Final Model
 Thus, the updated final model still contains the log of blotted uterus weights as the response, transformations of dose 1, dose 2, and body as noted above, and random effects for protocol, dose 1, and dose 2 between labs.
 ```{r}
-m4 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
+m4 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
 #X + Z + R + S + random effect
 #summary(m4)
 ```
@@ -118,6 +118,7 @@ qqnorm(resid(m4))
 ```
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
 
+#Final Model Goodness of Fit
 ```{r cache = T, echo = F}
 R5 <- NULL
 SD <- NULL
@@ -125,7 +126,7 @@ for(i in 1: 100) {
   samp <- sample(dim(dat)[1], dim(dat)[1]/10)
   test <- dat[samp,]
   train <- dat[-samp,]
-  ufinmod <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
+  ufinmod <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
   p_finmod <- predict(ufinmod, test)
   SD <- rbind(SD, sd(log(test$blot + 1)))
   R5 <- rbind(R5, RMSE(p_finmod, log(test$blot+1)))
@@ -135,4 +136,3 @@ for(i in 1: 100) {
 By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of after 100 iterations.
 
 
-#Final Model Goodness of Fit
