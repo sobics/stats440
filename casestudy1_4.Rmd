@@ -7,7 +7,36 @@ output:
   html_document: default
   word_document: default
 ---
-#Transitioning from the Linear Mixed Effects Model
+```{r echo = F}
+library(dplyr)
+library(lme4)
+library(ggplot2)
+library(magrittr)
+library(knitr)
+```
+#Introduction
+The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. An original linear mixed effects model with general transofrmations was fit to the data, however, further exploration showed that a linear mixed effects model with kernel estimates and clustering for certain features provided better results.
+
+#Methodology
+Our approach to answer our problem followed these 4 steps: 
+1. Data-cleaning
+
+2. Exploratory Data Analysis 
+
+3. Fitting the data to a Linear Mixed-Effect Model 
+
+4. Interpreting the data, model, and results
+
+#Dataset
+The final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
+Three key pieces of data were removed: 4 observations due to missing data, the feature, group, due to multicollinearity, and the feature, wet, due to its variability in capturing the uterus weight. Below is a preview of the final dataset:
+```{r}
+kable(head(dat))
+```
+
+##Final Model: Linear Mixed Effect Model
+
+#Transitioning from General Transformations
 Previously, we attempted to model the non-linearity of dose 1 and dose 2 by modeling these features as polynomials with a degree of 2. However, modeling these features as polynomials did not fully capture their distribution against the response, blot. Our previous final model, overall, fit the data well according to the qq-plot and residual vs. fitted graph. However, we show below that we can better fit a model by fitting dose 1 and dose 2 via kernel estimations and by transforming body into a categorical variable via k-means clustering (k = 3). Below is an explanation of our updated final model. 
 
 ##Capturing the Non-Linearity of Dose 1 and Dose 2
@@ -16,10 +45,6 @@ Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we deci
 
 ```{r include = F}
 #Read in the data
-library(dplyr)
-library(lme4)
-library(ggplot2)
-library(magrittr)
 dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".", colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric"))
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
@@ -54,6 +79,7 @@ smooth_graph <- function(x,knots = 4) {
   }
   return(X.predict)
 }
+RMSE <- function(x,y) {return(sqrt(mean((y-x)^2)))} 
 ```
 
 ```{r echo = F, warning= F}
@@ -119,7 +145,7 @@ qqnorm(resid(m4))
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
 
 #Final Model Goodness of Fit
-```{r cache = T, echo = F}
+```{r cache = T, echo = F, warning = F}
 R5 <- NULL
 SD <- NULL
 for(i in 1: 100) {
@@ -135,4 +161,21 @@ for(i in 1: 100) {
 
 By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of `r mean(R5)`after 100 iterations.
 
+#Discussion of Updated Final Model
+This updated final model produced similar results to the previous final model. 
+
+#Differences in the Effects of Dose 1, Dose 2, and Protocol Between Labs
+Looking at the variation of the random effects of dose 1, dose 2, and protocol on lab, there exists high variation in blotted uterus weight for each of these features between the different labs as denoted by the variance (`r `, respectively). High variance suggests that these labs are not comparable because it suggests that the blotted uterus weight has no distinct response across all labs after adding dose 1, dose 2, or utilizing a certain protocol.
+
+#Differences in Body Weight Between Labs
+After clustering the body weight of each rat into three categories, with the body weight of group 1 > group 2 > group 3. Using group 1 as a baseline, if the blotted uterus weight of a rat that was in group 2 increased by one unit, then we would expect a ___ unit increase in the blotted uterus weight of a rat that was in group 1. If the blotted uterus weight of a rat that was in group 3 increased by one unit, then we would expect a __ unite increase in the blotted uterus weight of a rat that was in group 1.
+Since all labs do not have rats with similar body weights (Lab A's mean body weight: vs Lab X's mean body weight:), these differences in body weight would affect the response, blotted uterus weight, and make the labs again, incomparable because the high variance of the response per each group of body weights makes it hard ....
+
+
+#Recommendations
+Again, differences in protocols seem to matter more than differences in labs. The fixed effect differences in labs are largely insignificant and have little effect on blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. The lab with the largest differences in blotted uterus weight compared to that of _____________________.
+
+Of course, the effects of the two doses vary between labs as well.
+
+To avoid this problem altogether, we recommend that this assay would be best conducted in one lab, one standard body weight, and one protocol to ensure consistency in the results. 
 
