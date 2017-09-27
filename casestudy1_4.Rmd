@@ -3,9 +3,9 @@ title: "Case 1 Take 4"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 25, 2017"
 output:
-  word_document: default
   pdf_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r echo = F}
@@ -196,3 +196,8 @@ To avoid this problem altogether, we recommend that this assay would be best con
 ```{r warning = F, echo = F}
 summary(m4)
 ```
+
+#Contributions
+Sonia Xu: Wrote Case 1, Take 4 (Updated Model, Discussion, etc.)
+InHee Ho: Wrote Exploratory Data Analysis, Edited Case 1, Take 4
+Ian Hua: Edited Case 1, Take 4 
