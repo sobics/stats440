@@ -23,7 +23,7 @@ dat <- read.table("case1.txt", header = T, stringsAsFactors = F, na.strings = ".
 dat <-  dat %>% filter(complete.cases(blot)) 
 ```
 #Introduction
-The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. An original linear mixed effects model with general transofrmations was fit to the data, however, further exploration showed that a linear mixed effects model with kernel estimates and clustering for certain features provided better results.
+The following data is from an international validation study (19 labs, 6 nations) of the rat uterotrophic bioassay. The purpose of the assay was to screen chemicals for estrogenic effects--agonist (EE) or antagonist (ZM). One clear challenge from the assay was the consistency among variables and protocols throughout all data in the study. The motivation of this study is to fit the best model against the data to identify potential differences between labs, and to assess the consistency and effectiveness of the two chemicals. An original linear mixed effects model with general transformations was fit to the data; however, further exploration showed that a linear mixed effects model with kernel estimates and clustering for certain features provided better results.
 
 #Methodology
 Our approach to answer our problem followed these 4 steps: 
@@ -45,7 +45,7 @@ kable(head(dat))
 ##Final Model: Linear Mixed Effect Model
 
 #Transitioning from the Linear Mixed Effects Model
-In our previous report, we attempted to handle the non-linearity of dose 1 and dose 2 by taking their logarithms and modeling as polynomials with a degree of 2. Overall, our previous final model fitted the data well according to the qq-plot and residual vs. fitted graph. However, using second-degree polynomials of the logarithmized values of dose 1 and dose 2 did not fully capture the uneven distribution of dose 1 and dose 2 against the response, blotted uterus weight. We can better fit the model using kernel regression and clustering. We present below our updated final model that applies kernel estimations to dose 1 and dose 2 and transforms body weight into a categorical variable via k-means clustering, and how the model better predicts our response.
+In our previous report, we attempted to handle the non-linearity of dose 1 and dose 2 by taking their logarithms and modeling as polynomials with a degree of 2. Overall, our previous final model fitted the data well according to the qq-plot and residual vs. fitted graph. However, using second-degree polynomials of the logarithmized values of dose 1 and dose 2 did not fully capture the uneven distribution of dose 1 and dose 2 against the response, blotted uterus weight. We can better fit the model using kernel regression and clustering. We present below our updated final model that applies kernel estimations to dose 1 and dose 2 and transforms body weight into a categorical variable via k-means clustering, and how this model better predicts our response.
 
 #Exploratory Data Analysis
 We continued from our previous report with our choices of explanatory variables. We detected significant heteroscedasticity in our response variable (blotted uterus weight) between labs, and took their logarithms for more consistent variance. Furthermore, protocols can have different effects on the response depending on the labs. We capture such difference by fitting random effects proto|lab. Finally, to capture the effects of doses of chemical 1 and 2 across all labs as well as their variation between labs, we added dose 1 and dose 2 as both fixed and random effects. However, we used different methods to better capture the distributions of dose 1, dose 2, and body weight.
@@ -134,7 +134,7 @@ summary(m3)
 ```
 
 #The Updated Final Model
-Thus, our updated final model still has the log of blotted uterus weights as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. But dose 1, dose 2, and body weight now reflect the transformations as noted above.
+Thus, our updated final model still has the log of blotted uterus weight as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. But dose 1, dose 2, and body weight now reflect the transformations as noted above.
 ```{r warning = F}
 m4 <- lmer(log(blot+1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
 #X + Z + R + S + random effect
@@ -174,7 +174,7 @@ This updated final model produced similar results to the previous final model.
 #Differences in the Effects of Dose 1, Dose 2, and Protocol Between Labs
 High variance suggests that these labs are not comparable because it suggests that the blotted uterus weight has no distinct response across all labs after adding dose 1, dose 2, or utilizing a certain protocol. Protocol A is used as a baseline for for the random effects. Looking at the variation of the random effects of dose 1, dose 2, and protocol on lab, there exists variation in blotted uterus weight for each of these features between the different labs as denoted by the variance. 
 
-In particular, protocols C & D have a higher variance compared to protocol A. Protocol B has a slightly higher variance compared to protocol A. Thus, protocols C & D may be comparable, but not protocols A & D. Intuitively, this makes sense because the Protcols A and B have lower body weights than Protcols C and D, as illustrated below:
+In particular, protocols C & D have a higher variance compared to protocol A. Protocol B has a slightly higher variance compared to protocol A. Thus, for example, protocols C & D may be comparable, but not protocols A & D. Intuitively, this makes sense because the Protcols A and B have lower body weights than Protcols C and D, as illustrated below:
 ```{r echo = F}
 ggplot(dat, aes(body, blot, col = proto)) + geom_point()
 ```
@@ -182,12 +182,12 @@ ggplot(dat, aes(body, blot, col = proto)) + geom_point()
 There exists extremely high variation for dose 1, so the effect of dose 1 highly varies between labs. Although not as high, there also exists variation for dose 2, so the effect of dose 2 also varies between labs. 
 
 #Differences in Body Weight Between Labs
-After clustering the body weight of each rat into three categories, with the body weight of group 1 (mean: 349.1) > group 3(mean: 60.4) > group 2(mean: 122.48). Using group 1 as a baseline, if the blotted uterus weight of a rat that was in group 2 increased by one unit, then we would expect a `r round(exp(-1.19)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1. If the blotted uterus weight of a rat that was in group 3 increased by one unit, then we would expect a `r round(exp(-006098)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1.
+After clustering the body weight of each rat into three categories, with the body weight of group 1 (mean: 349.1) > group 3 (mean: 60.4) > group 2 (mean: 122.48). Using group 1 as a baseline, if the blotted uterus weight of a rat that was in group 2 increased by one unit, then we would expect a `r round(exp(-1.19)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1. If the blotted uterus weight of a rat that was in group 3 increased by one unit, then we would expect a `r round(exp(-0.06098)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1.
 
-Since all labs do not have rats with similar body weights (Lab A's mean body weight: vs Lab X's mean body weight:), these differences in body weight would affect the response, blotted uterus weight, and make the labs again, incomparable.
+Since all labs do not have rats with similar body weights (Lab A's mean body weight:? vs Lab X's mean body weight:?), these differences in body weight would affect the response, blotted uterus weight, and make the labs again, incomparable.
 
 #Recommendations
-Again, differences in protocols seem to matter more than differences in labs. The random and fixed effects of dose 1 and dose 2 on blotted uterus weight vary between labs significantly. Body weight also has a slight effect on blotted uterus weight--the larger the body weight, the heavier the blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. 
+Again, differences in protocols seem to matter more than differences in labs. The random and fixed effects of dose 1 and dose 2 on blotted uterus weight vary between labs significantly. Body weight also has a slight effect on blotted uterus weight--the heavier the body weight, the heavier the blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. 
 
 
 To avoid this problem altogether, we recommend that this assay would be best conducted in one lab, one standard body weight, and one protocol to ensure consistency in the results. 
