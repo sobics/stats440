@@ -38,7 +38,7 @@ Our approach to answer our problem followed these 4 steps:
 #Dataset
 The final dataset contains 2677 observations and 6 features: lab, protocol, dose 1, dose 2, body weight, and blotted uterus weight.
 Three key pieces of data were removed: 4 observations due to missing data, the feature, group, due to multicollinearity, and the feature, wet, due to its variability in capturing the uterus weight. Below is a preview of the final dataset:
-```{r}
+```{r echo = F}
 kable(head(dat))
 ```
 
@@ -192,3 +192,7 @@ Again, differences in protocols seem to matter more than differences in labs. Th
 
 To avoid this problem altogether, we recommend that this assay would be best conducted in one lab, one standard body weight, and one protocol to ensure consistency in the results. 
 
+#Appendix
+```{r warning = F, echo = F}
+summary(m4)
+```
