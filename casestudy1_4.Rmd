@@ -3,9 +3,9 @@ title: "Case 1 Take 4"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 25, 2017"
 output:
+  word_document: default
   pdf_document: default
   html_document: default
-  word_document: default
 ---
 
 ```{r echo = F}
@@ -134,13 +134,14 @@ summary(m3)
 ```
 
 #The Updated Final Model
-Thus, our updated final model still has the log of blotted uterus weight as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. But dose 1, dose 2, and body weight now reflect the transformations as noted above.
-```{r warning = F}
+Thus, our updated final model still has the log of blotted uterus weight as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. The difference between the previous and updated final model is that dose 1, dose 2, and body weight now reflect the transformations as noted above.
+```{r echo = F, warning = F}
 m4 <- lmer(log(blot+1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
 #X + Z + R + S + random effect
 #summary(m4)
 ```
 #Checking Assumptions
+The updated model satisfies the linearity checks of a linear mixed effect model.
 ```{r echo = F}
 plot(m4, main = 'Residuals vs. Fitted', xlab = "Fitted", ylab = "Residuals")
 ```
@@ -151,8 +152,9 @@ qqnorm(resid(m4))
 ```
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
 
-#Final Model Goodness of Fit
-```{r cache = T, echo = F, warning = F}
+#Goodness of Fit
+```{r eval = F, echo = F}
+#cache = T, echo = F, warning = F, ignore = T
 R5 <- NULL
 SD <- NULL
 for(i in 1: 100) {
@@ -166,7 +168,7 @@ for(i in 1: 100) {
 }
 ```
 
-By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of `r round(mean(R5),3)` after 100 iterations, so it is a slight improvement from our previous final model.
+By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 segments, this updated final model produced better predictive results for the train vs. test data. The previous final model had a root mean squared error (RMSE) of 0.2339 after 100 iterations. This final model had a root mean squared error of 0.222 after 100 iterations, so it is a slight improvement from our previous final model.
 
 #Discussion of Updated Final Model
 This updated final model produced similar results to the previous final model. 
@@ -182,13 +184,12 @@ ggplot(dat, aes(body, blot, col = proto)) + geom_point()
 There exists extremely high variation for dose 1, so the effect of dose 1 highly varies between labs. Although not as high, there also exists variation for dose 2, so the effect of dose 2 also varies between labs. 
 
 #Differences in Body Weight Between Labs
-After clustering the body weight of each rat into three categories, with the body weight of group 1 (mean: 349.1) > group 3 (mean: 60.4) > group 2 (mean: 122.48). Using group 1 as a baseline, if the blotted uterus weight of a rat that was in group 2 increased by one unit, then we would expect a `r round(exp(-1.19)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1. If the blotted uterus weight of a rat that was in group 3 increased by one unit, then we would expect a `r round(exp(-0.06098)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1.
+After clustering the body weight of each rat into three categories, the body weight of group 1 (mean body weight: 349.1) > (is greater than) group 3 (mean: 122.48) > (is greater than) group 2 (mean:60.4). Using group 1 as a baseline, if the blotted uterus weight of a rat that was in group 2 increased by one unit, then we would expect a `r round(exp(-1.19)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1. If the blotted uterus weight of a rat that was in group 3 increased by one unit, then we would expect a `r round(exp(-0.06098)-1,3)` unit decrease in the blotted uterus weight of a rat that was in group 1.
 
-Since all labs do not have rats with similar body weights (Lab A's mean body weight:? vs Lab X's mean body weight:?), these differences in body weight would affect the response, blotted uterus weight, and make the labs again, incomparable.
+Since all labs do not have rats with similar body weights (Lab Basf's mean body weight: 56.7 vs Lab Mitsubishi's mean body weight:144.7), these differences in body weight would affect the response, blotted uterus weight, and make the labs again, incomparable.
 
 #Recommendations
 Again, differences in protocols seem to matter more than differences in labs. The random and fixed effects of dose 1 and dose 2 on blotted uterus weight vary between labs significantly. Body weight also has a slight effect on blotted uterus weight--the heavier the body weight, the heavier the blotted uterus weight. Due to the variability between labs, perhaps not all labs should be compared and rather groupings of similar labs should be investigated as there are many similar labs with negligible differences. 
-
 
 To avoid this problem altogether, we recommend that this assay would be best conducted in one lab, one standard body weight, and one protocol to ensure consistency in the results. 
 
