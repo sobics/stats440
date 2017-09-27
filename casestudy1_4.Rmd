@@ -107,7 +107,7 @@ lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
 ```
 ##Transforming Body into a Categorical Variable
 ```{r, echo=F}
-ggplot(data = dat, aes(x=body, y=blot, color=lab))+geom_point(alpha=0.5)
+ggplot(data = dat, aes(x=body, y=blot))+geom_point(alpha=0.5) + ggtitle("Body vs. Blotted Uterus Weight")
 ```
 
 Looking at the scatterplot above between body and blotted uterus weight, we observe two distinct groups of body weight. These groups are non-linear, so it would be best to distinguish them in an unsupervised fashion. K-means clustering with 3 groups resulted in the best segmentation of the data, and these groups (1,2,3) replaced the continuous variable of body weight for the final model. Below is a plot of the 3 different clusters.
@@ -117,7 +117,8 @@ set.seed(20)
 bodyCluster <- kmeans(dat[, c(6,8)], 3, nstart = 20)
 
 bodyCluster$cluster <- as.factor(bodyCluster$cluster)
-ggplot(dat, aes(body, blot, color = bodyCluster$cluster)) + geom_point()
+ggplot(dat, aes(body, blot, color = bodyCluster$cluster)) + geom_point() +
+    labs(color = "cluster") + ggtitle("Body vs. Blotted Uterus Weight with Clusters") 
 
 #Splits the body weight into 3 bins...
 ##add it back to the data & replace body with these 3 groups
@@ -134,18 +135,18 @@ summary(m3)
 
 #The Updated Final Model
 Thus, our updated final model still has the log of blotted uterus weights as the response variable; protocol, dose 1, and dose 2 as random effects between labs; and dose 1, dose 2, and body weight as fixed effects across all population. But dose 1, dose 2, and body weight now reflect the transformations as noted above.
-```{r}
+```{r warning = F}
 m4 <- lmer(log(blot+1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
 #X + Z + R + S + random effect
 #summary(m4)
 ```
 #Checking Assumptions
-```{r}
+```{r echo = F}
 plot(m4, main = 'Residuals vs. Fitted', xlab = "Fitted", ylab = "Residuals")
 ```
 Looking at the Residuals vs. Fitted plot, the points exhibit homoscedascity, and overall, the points are randomly and evenly distributed above and below the horizontal axis. This implies that the data should be modeled linearly. 
 
-```{r}
+```{r echo = F}
 qqnorm(resid(m4))
 ```
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
