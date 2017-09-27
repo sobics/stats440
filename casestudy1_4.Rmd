@@ -8,10 +8,13 @@ output:
   word_document: default
 ---
 #Transitioning from the Linear Mixed Effects Model
-Previously, we attempted to model the non-linearity of dose 1 and dose 2 by modeling these features as polynomials with a degree of 2. However, modeling these features as polynomials did not fully capture their distribution against the response, blot. Our previous final model, overall, fit the data well according to the qq-plot and residual vs. fitted graph. However, we show below that we can better fit a model by fitting dose 1 and dose 2 via kernel estimations and by transforming body into a categorical variable via k-means clustering (k = 3). Below is an explanation of our updated final model. 
+In our previous report, we attempted to handle the non-linearity of dose 1 and dose 2 by taking their logarithms and modeling as polynomials with a degree of 2. Overall, our previous final model fitted the data well according to the qq-plot and residual vs. fitted graph. However, using second-degree polynomials of the logarithmized values of dose 1 and dose 2 did not fully capture the uneven distribution of dose 1 and dose 2 against the response, blotted uterus weight. We can better fit the model using kernel regression and clustering. We present below our updated final model that applies kernel estimations to dose 1 and dose 2 and transforms body weight into a categorical variable via k-means clustering, and how the model better predicts our response.
+
+#Exploratory Data Analysis
+We continued from our previous report with our choices of explanatory variables. We detected significant heteroscedasticity in our response variable (blotted uterus weight) between labs, and took their logarithms for more consistent variance. Furthermore, protocols can have different effects on the response depending on the labs. We capture such difference by fitting random effects proto|lab. Finally, to capture the effects of doses of chemical 1 and 2 across all labs as well as their variation between labs, we added dose 1 and dose 2 as both fixed and random effects. However, we used different methods to better capture the distributions of dose 1, dose 2, and body weight.
 
 ##Capturing the Non-Linearity of Dose 1 and Dose 2
-Instead of modeling dose 1 and dose 2 as polynomials with a degree of 2, we decided to capture the non-linearity of dose 1 and dose 2 via kernel regression. Below are plots of how the kernel distribution fits against the true data for dose 1 and dose 2.
+In order to capture the non-linearity of the distribution of dose 1 and dose 2, we decided to use kernel regression instead of modeling with second-degree polynomials of logarithmized values. 
 
 
 ```{r include = F}
