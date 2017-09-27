@@ -2,7 +2,10 @@
 title: "Case 1 Take 4"
 author: "Ian Hua, InHee Ho, Sonia Xu"
 date: "September 25, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
 ---
 #Transitioning from the Linear Mixed Effects Model
 Previously, we attempted to model the non-linearity of dose 1 and dose 2 by modeling these features as polynomials with a degree of 2. However, modeling these features as polynomials did not fully capture their distribution against the response, blot. Our previous final model, overall, fit the data well according to the qq-plot and residual vs. fitted graph. However, we show below that we can better fit a model by fitting dose 1 and dose 2 via kernel estimations and by transforming body into a categorical variable via k-means clustering (k = 3). Below is an explanation of our updated final model. 
@@ -57,9 +60,11 @@ smooth_graph <- function(x,knots = 4) {
 
 #attach(dat) ##attaches the data so we can just run through with the variable names
 
-m2 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) , data = dat)  #X + Z + R + S + random effect
+m2 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 4) + kern_distribution(dose2, knots = 3) , data = dat)  #X + Z + R + S + random effect
 #summary(m2)
+```
 
+```{r echo = F}
 plot(dat$dose1,log(dat$blot + 1), col = "red", main = "Fitted Kernels for Dose 1", ylab = "log(blot + 1)", xlab = "dose 1") #plots the true data
 lines(sort(dat$dose1), fitted(m2)[order(dat$dose1)]) #shows how well the model fits the true data
 #abline(v = tau)
@@ -68,17 +73,6 @@ plot(dat$dose2, log(dat$blot + 1), col = "red", main = "Fitted Kernels for Dose 
 lines(sort(dat$dose2), fitted(m2)[order(dat$dose2)])
 #abline(v = tau)
 
-```
-
-
-```{r include = F}
-#smooth version
-m3 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, knots = 3) + smooth_graph(dose2, knots = 3) + smooth_graph(body, knots = 3), data = dat) #X + Z + R + S + random effect
-summary(m3)
-y.predict <- predict(m3, dat)
-  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
-plot(dat$dose2,log(dat$blot+1))
-lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
 ```
 ##Transforming Body into a Categorical Variable
 Looking at the scatterplot between body and blotted uterus weight, there are two distinct groups for body weight. These groups are non-linear, so it would be best to distinguish them in an unsupervised fashion. K-means clustering with 3 groups resulted in the best segmentation of the data, and these groups (1,2,3) replaced the continuous variable of body weight for the final model. Below is a plot of the 3 different clusters.
@@ -95,9 +89,24 @@ ggplot(dat, aes(body, blot, color = bodyCluster$cluster)) + geom_point()
 
 dat$bodyClust <- bodyCluster$cluster
 ```
+
+```{r include = F}
+#smooth version
+m3 <- lmer(log(blot + 1) ~ (1 + proto|lab) + smooth_graph(dose1, knots = 3) + smooth_graph(dose2, knots = 3) + smooth_graph(body, knots = 3), data = dat) #X + Z + R + S + random effect
+summary(m3)
+y.predict <- predict(m3, dat)
+  #cbind(1, cbind(smooth_graph(dat$dose1, dat$blot), ) %*% coef(m2) #predict function is easier // but cbind(X.predicts)
+plot(dat$dose2,log(dat$blot+1))
+lines(sort(dat$dose2), fitted(m3)[order(dat$dose2)])
+```
+
 #The Updated Final Model
 Thus, the updated final model still contains the log of blotted uterus weights as the response, transformations of dose 1, dose 2, and body as noted above, and random effects for protocol, dose 1, and dose 2 between labs.
-
+```{r}
+m4 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
+#X + Z + R + S + random effect
+#summary(m4)
+```
 #Checking Assumptions
 ```{r}
 plot(m4, main = 'Residuals vs. Fitted', xlab = "Fitted", ylab = "Residuals")
@@ -109,7 +118,7 @@ qqnorm(resid(m4))
 ```
 Checking the normality assumption via the QQ-plot, the points overall follow a straight diagonal trend, which reaffirms that the points are normally distributed.
 
-```{r echo = F}
+```{r cache = T, echo = F}
 R5 <- NULL
 SD <- NULL
 for(i in 1: 100) {
@@ -119,7 +128,7 @@ for(i in 1: 100) {
   ufinmod <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) 
   p_finmod <- predict(ufinmod, test)
   SD <- rbind(SD, sd(log(test$blot + 1)))
-  R5 <- rbind(R4, RMSE(p_finmod, log(test$blot+1)))
+  R5 <- rbind(R5, RMSE(p_finmod, log(test$blot+1)))
 }
 ```
 
@@ -127,7 +136,3 @@ By fitting dose 1 and dose 2 via kernel regression and clustering body into 3 se
 
 
 #Final Model Goodness of Fit
-```{r}
-#m4 <- lmer(log(blot + 1) ~ (1 + proto + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3)|lab) + kern_distribution(dose1, knots = 5) + kern_distribution(dose2, knots = 3) + bodyClust, data = dat) #X + Z + R + S + random effect
-summary(m4)
-```
